@@ -5,12 +5,8 @@
 # http://www.opengeosys.org/project/license
 ###
 
-import sys
-print(sys.version)
-import os
 import numpy as np
 from pandas import read_csv
-from tespy.networks import load_network
 
 #%% User setting +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # parameters

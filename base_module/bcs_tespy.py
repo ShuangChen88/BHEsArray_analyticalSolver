@@ -72,7 +72,7 @@ def dyn_frate(t):  # dynamic flowrate in BHE
 #%% create network dataframe
 def create_dataframe():
     # return dataframe
-    df_nw = read_csv('./pre/bhe_network.csv',
+    df_nw = read_csv('./base_module/pre/bhe_network.csv',
                         delimiter=';',
                         index_col=[0],
                         dtype={'data_index': str})
@@ -170,48 +170,3 @@ class BC():
                 data_flowrate = dataframe['flowrate'].tolist()
         # return to OGS
         return (if_dyn_frate, data_flowrate)
-
-
-#%% main
-# initialize the tespy model of the bhe network
-# load path of network model:
-# loading the TESPy model
-project_dir = os.getcwd()
-print("Project dir is: ", project_dir)
-nw = load_network('./pre/tespy_nw')
-# set if print the network iteration info
-nw.set_attr(iterinfo=False)
-
-# create bhe dataframe of the network system from bhe_network.csv
-df = create_dataframe()
-n_BHE = np.size(df.iloc[:, 0])
-
-# create local variables of the components label and connections label in
-# network
-localVars = locals()
-data_index = df.index.tolist()
-for i in range(n_BHE):
-    for c in nw.conns.index:
-        # bhe inlet and outlet conns
-        if c.t.label == data_index[i]:  # inlet conns of bhe
-            localVars['inlet_BHE' + str(i + 1)] = c
-        if c.s.label == data_index[i]:  # outlet conns of bhe
-            localVars['outlet_BHE' + str(i + 1)] = c
-
-# time depended consumer thermal demand
-if switch_dyn_demand == 'on':
-    # import the name of bus from the network csv file
-    bus_name = read_csv('./pre/tespy_nw/comps/bus.csv',
-                    delimiter=';',
-                    index_col=[0]).index[0]
-
-# time depended flowrate
-if switch_dyn_frate == 'on':
-    # import the name of inlet connection from the network csv file
-    inlet_name = read_csv('./pre/tespy_nw/conn.csv',
-                    delimiter=';',
-                    index_col=[0]).iloc[0,0]
-    for c in nw.conns.index:
-        # bhe inflow conns
-        if c.s.label == inlet_name:  # inlet conns of bhe
-            localVars['inlet_name'] = c

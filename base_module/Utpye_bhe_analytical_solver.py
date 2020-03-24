@@ -14,10 +14,7 @@
 '''
 
 import numpy as np
-from scipy import special as sp
-import math
-import pandas as pd
 
 
 def Type_1U_BHE_cal(t):
-    return (10)
+    return (10,20)

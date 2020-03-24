@@ -114,16 +114,19 @@ def tespy_solver(t):
 
 #%% Tespy network model main solver function
 def nw_solver(t, Tin_val, Tout_val):
+    #system converge control
+    if_success = False
     # network status:
     nw_status = network_status(t)
     # if network closed:
     #     print('nw_status = ', nw_status)
     if nw_status == 'off':
+        if_success = True
         #flowrate
         for i in range(n_BHE):
             df_nw.loc[df_nw.index[i], 'flowrate'] = 0
-        data_flowrate = df_nw['flowrate'].tolist()
-        return (data_flowrate, Tout_val)
+        cur_cal_f_r_val = df_nw['flowrate'].tolist()
+        return (if_success, cur_cal_f_r_val, Tout_val)
     else:
         # read Tout_val to dataframe
         for i in range(n_BHE):
@@ -131,7 +134,6 @@ def nw_solver(t, Tin_val, Tout_val):
         # TESPy solver
         cur_cal_f_r_val, cur_cal_Tin_val = tespy_solver(t)
         # check norm if network achieves the converge
-        if_success = False
         pre_cal_Tin_val = Tin_val
         norm = np.linalg.norm(
             abs(np.asarray(pre_cal_Tin_val) - np.asarray(cur_cal_Tin_val)))

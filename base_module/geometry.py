@@ -8,7 +8,8 @@ import numpy as np
 #%% User setting
 #input geometry of the model
 
-bhe_num = 3#BHE number
+bhe_num = 3 #BHE number
+BHE_wall_points_num = 4 #4 reference points on each BHE wall
 adj = 6 # borehole adjacent distance in m
 coord_center_point = [0,100]#the absolute coordinate of the center point of the array
 

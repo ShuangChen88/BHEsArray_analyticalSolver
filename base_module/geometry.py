@@ -41,3 +41,11 @@ for i in range(bhe_num):
                                                              br + bhe_pos_y[i],
                                                              0 + bhe_pos_y[i],
                                                             -br + bhe_pos_y[i]],dtype=float)
+
+#combine all reference points into one reference array, same with BHE coordinates 
+#array sequence, every 4 points refer to one BHE
+bhe_wall_pos_x = np.array([])
+bhe_wall_pos_y = np.array([])
+for i in range(bhe_num):
+    bhe_wall_pos_x = np.concatenate((bhe_wall_pos_x, localVars['bhe_'+ str(i) + '_wall_pos_x' ]))
+    bhe_wall_pos_y = np.concatenate((bhe_wall_pos_y, localVars['bhe_'+ str(i) + '_wall_pos_y' ]))

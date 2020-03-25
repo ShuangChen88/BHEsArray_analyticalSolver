@@ -54,8 +54,6 @@ for i in range(BHE_num):
     localVars['bhe_'+ str(i) + '_wall_pos_y' ] = geometry.localVars['bhe_'+ str(i) + '_wall_pos_y' ]
 
 
-#temp:
-bhe_id = 1    
 #%% functions
 def st_dataframe(step,BHE_id,st):
     #sourceterm dataframe starts from step = 1.

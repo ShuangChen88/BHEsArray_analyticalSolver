@@ -28,7 +28,7 @@ def network_status(t):
     timerange_nw_off_month = [-9999]  # No month for closed network
     # t-1 to avoid the calculation problem at special time point,
     # e.g. t = 2592000.
-    t_trans = int((t - 1) / 86400 / 30) + 1
+    t_trans = int((t - 1) / 86400) + 1
     t_trans_month = t_trans
     if t_trans_month > 12:
         t_trans_month = t_trans - 12 * (int(t_trans / 12))
@@ -40,14 +40,14 @@ def network_status(t):
 # dynamic consumer thermal load
 def consumer_demand(t):  # dynamic thermal demand from consumer
     # time conversion
-    t_trans = int((t - 1) / 86400 / 30) + 1
+    t_trans = int((t - 1) / 86400 ) + 1
     if t_trans > 12:
         t_trans = t_trans - 12 * (int(t_trans / 12))
     # thermal demand in each month (assumed specific heat extraction rate*
     # length of BHE* number of BHE)
     month_demand = [
-        -25 * 50 * 9, -25 * 50 * 9, -25 * 50 * 9, -25 * 50 * 9, -25 * 50 * 9, -25 * 50 * 9, 
-        25 * 50 * 9, 25 * 50 * 9, 25 * 50 * 9, 25 * 50 * 9, 25 * 50 * 9, 25 * 50 * 9 
+        -25 * 50 * 9, -25 * 50 * 9, -25 * 50 * 9, -25 * 50 * 9, -25 * 50 * 9, 
+        25 * 50 * 9, 25 * 50 * 9, 25 * 50 * 9, 25 * 50 * 9, 25 * 50 * 9
            ]
     return month_demand[t_trans - 1]
 
@@ -55,7 +55,7 @@ def consumer_demand(t):  # dynamic thermal demand from consumer
 # dynamic hydraulic flow rate
 def dyn_frate(t):  # dynamic flowrate in BHE
     # time conversion
-    t_trans = int((t - 1) / 86400 / 30) + 1
+    t_trans = int((t - 1) / 86400) + 1
     if t_trans > 12:
         t_trans = t_trans - 12 * (int(t_trans / 12))
     # flow rate in kg / s time curve in month

@@ -14,7 +14,7 @@ import base_module.Utpye_bhe_analytical_solver as mod_bhe
 import base_module.bcs_tespy as mod_nw
 
 #%%main parameters
-time_tot = 12*30*24*60*60 #s
+time_tot = 10*24*60*60 #s
 delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
 

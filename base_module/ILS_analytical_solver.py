@@ -22,12 +22,12 @@ import base_module.geometry as geometry
 #soil
 T0 = 15 #soil initial temperature
 rho_s = 1120 #kg/m3
-c_s = 1851.4 #J/kg*K
-k_s = 1.8 #W/m*K
+c_s = 1780 #J/kg*K
+k_s = 2.4 #W/m*K
 alpha = k_s/(rho_s*c_s) #m^2/s
 
 #time
-time_tot = 12*30*24*60*60 #s
+time_tot = 10*24*60*60 #s
 delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
 

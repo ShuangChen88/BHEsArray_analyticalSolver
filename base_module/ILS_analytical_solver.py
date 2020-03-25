@@ -32,15 +32,16 @@ delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
 
 #BHE 
-BHE_num = 3
-BHE_wall_points_num = 4
+BHE_num = geometry.bhe_num
+BHE_wall_points_num = geometry.BHE_wall_points_num
+BHE_wall_points_num_all = np.size(geometry.bhe_wall_pos_x)
 #power
 #create 3 dim dataframe to store the st_all for all BHE_wall_points
 #the data type in dataframe is:
 #axis 0: BHE_wall_points,
 #axis 1: BHE num, 
 #axis 2: timestep_tot  
-st_all_global = np.zeros((BHE_wall_points_num, BHE_num, timestep_tot))
+st_all_global = np.zeros((BHE_wall_points_num_all, BHE_num, timestep_tot))
 
 
 #bhe location
@@ -48,11 +49,8 @@ bhe_pos_x = geometry.bhe_pos_x
 bhe_pos_y = geometry.bhe_pos_y
 
 #import reference points (borehole wall points)
-localVars = locals()
-for i in range(BHE_num):
-    localVars['bhe_'+ str(i) + '_wall_pos_x' ] = geometry.localVars['bhe_'+ str(i) + '_wall_pos_x' ]
-    localVars['bhe_'+ str(i) + '_wall_pos_y' ] = geometry.localVars['bhe_'+ str(i) + '_wall_pos_y' ]
-
+bhe_wall_pos_x = geometry.bhe_wall_pos_x
+bhe_wall_pos_y = geometry.bhe_wall_pos_y
 
 #%% functions
 def st_dataframe(step,BHE_id,st):
@@ -61,31 +59,31 @@ def st_dataframe(step,BHE_id,st):
     #first step no need
     if cur_step == 0:
         st_all_global[:,:,cur_step] = st
-    for i in range(BHE_wall_points_num):
+    for i in range(BHE_wall_points_num_all):
         st_all_global[i,BHE_id,cur_step] = st
 
-def ILS_solver(timestep, bhe_id):
-    T_domain=np.zeros([BHE_wall_points_num,timestep])
-    coeff_all = np.zeros([BHE_wall_points_num,BHE_num,timestep])
+def ILS_solver(timestep):
+    T_domain=np.zeros([BHE_wall_points_num_all,timestep])
+    coeff_all = np.zeros([BHE_wall_points_num_all,BHE_num,timestep])
     
     for currstep in range(0,timestep):
         #data container
-        dist_bhe_to_ref_po= np.zeros([BHE_wall_points_num,BHE_num])
-        localcoeff= np.zeros([BHE_wall_points_num,BHE_num])
+        dist_bhe_to_ref_po= np.zeros([BHE_wall_points_num_all,BHE_num])
+        localcoeff= np.zeros([BHE_wall_points_num_all,BHE_num])
         
         for i in range(0,BHE_num):
             #coefficient of current timestep
-            for j in range(0,BHE_wall_points_num):
-                dist_bhe_to_ref_po[j,i] = (bhe_pos_x[i] - localVars['bhe_'+ str(bhe_id) + '_wall_pos_x' ][j] )**2     \
-                                        + (bhe_pos_y[i] - localVars['bhe_'+ str(bhe_id) + '_wall_pos_y' ][j] )**2
+            for j in range(0,BHE_wall_points_num_all):
+                dist_bhe_to_ref_po[j,i] = (bhe_pos_x[i] - bhe_wall_pos_x[j] )**2     \
+                                        + (bhe_pos_y[i] - bhe_wall_pos_y[j] )**2
                 exp1 = dist_bhe_to_ref_po[j,i]/(4*alpha*delta_t*(currstep+1))
                 n1 = sp.exp1(exp1)
                 localcoeff[j,i] = 1/(4*math.pi*k_s)*n1  
             #coefficient of current timestep after 
             if currstep > 0 :
-                for j in range(0,BHE_wall_points_num):
-                    dist_bhe_to_ref_po[j,i] = (bhe_pos_x[i] - localVars['bhe_'+ str(bhe_id) + '_wall_pos_x' ][j] )**2     \
-                                            + (bhe_pos_y[i] - localVars['bhe_'+ str(bhe_id) + '_wall_pos_y' ][j] )**2
+                for j in range(0,BHE_wall_points_num_all):
+                    dist_bhe_to_ref_po[j,i] = (bhe_pos_x[i] - bhe_wall_pos_x[j] )**2     \
+                                            + (bhe_pos_y[i] - bhe_wall_pos_y[j] )**2
                     exp1 = dist_bhe_to_ref_po[j,i]/(4*alpha*delta_t*currstep)
                     n1 = sp.exp1(exp1)
                     localcoeff[j,i] = localcoeff[j,i] - 1/(4*math.pi*k_s)*n1  
@@ -101,9 +99,13 @@ def ILS_solver(timestep, bhe_id):
         T_domain[:,currstep] =  np.sum(np.sum(coeff_all[:,:,timestep-1-currstep:]
                                 *st_all_global[:,:,:currstep+1],axis=1),axis=1) + T0                              
     
-    #get the selected BHE' average wall soil temperature by summarizing the
-    #all 4 reference points temperature 
-    bhe_avg_soil_T = np.sum(T_domain[:,timestep-1],axis=0)/BHE_wall_points_num
-    return bhe_avg_soil_T
-
-    
+    #get each BHE' average wall soil temperature by summarizing the
+    #all 4 reference points temperature of each BHE. Then combine all BHEs
+    #average wall soil temperatures into one array and send back.
+    bhes_avg_wallsoil_T_array = np.zeros(BHE_num)
+    #summarizing each 4 points temperature as one BHE's average wall soil temperature
+    for i in range(BHE_num):
+        bhes_avg_wallsoil_T_array[i] = np.sum(T_domain[i * BHE_wall_points_num:
+                                                      (i + 1) * BHE_wall_points_num
+                                                ,timestep-1],axis=0)/BHE_wall_points_num
+    return bhes_avg_wallsoil_T_array

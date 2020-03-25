@@ -34,6 +34,7 @@ col_name = []
 for i in range(0, timestep_tot+1):
     col_name.append('Time at ' + str(i) + 'step')
 ##soil
+#BHE' wall soil interface temperature
 Result_df_soil = pd.DataFrame(np.zeros((BHE_num, timestep_tot+1)),index=row_name, columns=col_name)
 ##BHE
 #BHE power is the driving force of the system, start from timestep = 1,
@@ -79,9 +80,8 @@ for step in range(1, timestep_tot +1):
         #soil
         #global sourceterm dataframe in [W/m] in module ILS initialise ab timestep = 1
         mod_ILS.st_dataframe(1,0, Result_df_BHE_power.iloc[0,1]/BHE_length)
-        #update global dataframe soil temperature
-        for j in range(BHE_num):
-            Result_df_soil.iloc[j,1] = mod_ILS.ILS_solver(step,j)
+        #update global dataframe BHE' wall soil interface temperature
+        Result_df_soil.iloc[:,step] = mod_ILS.ILS_solver(step)
         #sys time info output
         print('timestep %d took %.3f s' %(step, time.clock() - time_step_start))
     else:
@@ -131,8 +131,7 @@ for step in range(1, timestep_tot +1):
             
         #3nd: ILS solver
         #update global dataframe soil temperature
-        for j in range(BHE_num):
-            Result_df_soil.iloc[j,step] = mod_ILS.ILS_solver(step,j)
+        Result_df_soil.iloc[:,step] = mod_ILS.ILS_solver(step)
         
         #sys time info output
         print('Timestep %d took %.3f s' %(step, time.clock() - time_step_start))

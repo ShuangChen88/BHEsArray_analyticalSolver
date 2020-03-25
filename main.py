@@ -19,7 +19,8 @@ delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
 
 #BHE
-BHE_num = 3
+BHE_num = 9
+BHE_length = 50 #m
 BHE_f_r = 0.5 #kg/s
 
 #%%initialize
@@ -52,7 +53,7 @@ Result_df_BHE_f_r = Result_df_BHE_f_r + BHE_f_r
 T0 = mod_ILS.T0
 Result_df_soil.iloc[:,0] = T0
 
-#'''    
+   
 #%%solve
 #solver time counter starts
 time_solver_start = time.clock()
@@ -66,17 +67,15 @@ for step in range(1, timestep_tot +1):
     if step == 1:
         #update global dataframe BHE power
         Result_df_BHE_power.iloc[:,1] = mod_nw.consumer_demand(0)/BHE_num
-        '''
-        TODO: mod_bhe two calculation sort
+#        TODO: mod_bhe two calculation sort
         #update global dataframe BHE inflow and out flow
         Result_df_fluid_in.iloc[:,1] = mod_bhe.Type_1U_BHE_cal_singel(
                 Result_df_BHE_power.iloc[0,1], T0)[0]
         Result_df_fluid_out.iloc[:,1] = mod_bhe.Type_1U_BHE_cal_singel(
                 Result_df_BHE_power.iloc[0,1], T0)[1]
-        '''
         #soil
-        #global sourceterm dataframe in module ILS initialise ab timestep = 1
-        mod_ILS.st_dataframe(1,0, Result_df_BHE_power.iloc[0,1])
+        #global sourceterm dataframe in [W/m] in module ILS initialise ab timestep = 1
+        mod_ILS.st_dataframe(1,0, Result_df_BHE_power.iloc[0,1]/BHE_length)
         #update global dataframe soil temperature
         for j in range(BHE_num):
             Result_df_soil.iloc[j,1] = mod_ILS.ILS_solver(step,j)
@@ -92,18 +91,15 @@ for step in range(1, timestep_tot +1):
                                       Result_df_fluid_out.iloc[:,step-1])
             #2nd: BHE solver
             for j in range(BHE_num):#loop all BHEs
-
-                '''
-                TODO: mod_bhe two calculation sort
+#                TODO: mod_bhe two calculation sort
                 #get each BHE's Tout
                 Result_df_fluid_out.iloc[j,step] = mod_bhe.Type_1U_BHE_cal(
                 Result_df_fluid_in.iloc[j,step], Result_df_soil.iloc[j,step-1])[0]
                 #get each BHE's power
                 Result_df_BHE_power.iloc[j,step] = mod_bhe.Type_1U_BHE_cal(
                 Result_df_fluid_in.iloc[j,step], Result_df_soil.iloc[j,step-1])[1]
-                '''
                 #update the global sourceterm dataframe in module ILS
-                mod_ILS.st_dataframe(step,j, Result_df_BHE_power.iloc[j,step])
+                mod_ILS.st_dataframe(step,j, Result_df_BHE_power.iloc[j,step]/BHE_length)
             #determin if the Tout is converged
             if (if_converge):
                 break
@@ -116,4 +112,4 @@ for step in range(1, timestep_tot +1):
 time_solver_end = time.clock()
 print('total solver execution took', (time_solver_end - time_solver_start)/60, 'min' )
 print('The whole computation terminated on', time.ctime() )
-#'''
+

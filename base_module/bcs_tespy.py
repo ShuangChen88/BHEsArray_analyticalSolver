@@ -46,10 +46,9 @@ def consumer_demand(t):  # dynamic thermal demand from consumer
     # thermal demand in each month (assumed specific heat extraction rate*
     # length of BHE* number of BHE)
     month_demand = [
-        -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3,
-        -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3,
-        -25 * 50 * 3, -25 * 50 * 3
-    ]
+        -25 * 50 * 9, -25 * 50 * 9, -25 * 50 * 9, -25 * 50 * 9, -25 * 50 * 9, -25 * 50 * 9, 
+        25 * 50 * 9, 25 * 50 * 9, 25 * 50 * 9, 25 * 50 * 9, 25 * 50 * 9, 25 * 50 * 9 
+           ]
     return month_demand[t_trans - 1]
 
 

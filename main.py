@@ -21,7 +21,7 @@ timestep_tot = int(time_tot/delta_t)
 #BHE
 BHE_num = 3
 BHE_length = 50 #m
-BHE_f_r = 0.5 #kg/s
+#BHE_f_r = 0.5 #kg/s #system pipe flowrate is defined in bcs_tespy.py or tespy model
 
 #%%initialize
 ###main data containers initialise
@@ -47,8 +47,6 @@ Result_df_fluid_in = pd.DataFrame(index=row_name, columns=col_name)
 Result_df_fluid_out = pd.DataFrame(index=row_name, columns=col_name)
 
 #parameters initialise
-#BHE
-Result_df_BHE_f_r = Result_df_BHE_f_r + BHE_f_r
 #soil
 T0 = mod_ILS.T0
 Result_df_soil.iloc[:,0] = T0
@@ -89,15 +87,22 @@ for step in range(1, timestep_tot +1):
             if_converge, f_r, T_in = mod_nw.nw_solver(t,
                                       Result_df_fluid_in.iloc[:,step-1],
                                       Result_df_fluid_out.iloc[:,step-1])
+            #update flowrate and Tin
+            Result_df_BHE_f_r[:,step] = f_r
+            Result_df_fluid_in.iloc[:,step] = T_in
             #2nd: BHE solver
             for j in range(BHE_num):#loop all BHEs
 #                TODO: mod_bhe two calculation sort
+                #get each BHE's Tout and power from the current timestep 
+                #Tin, flowrate and Tsoil from last timestep
+                cur_Tin_and_power = mod_bhe.Type_1U_BHE_cal(
+                Result_df_fluid_in.iloc[j,step], 
+                Result_df_soil.iloc[j,step-1],
+                Result_df_BHE_f_r.iloc[j,step])
                 #get each BHE's Tout
-                Result_df_fluid_out.iloc[j,step] = mod_bhe.Type_1U_BHE_cal(
-                Result_df_fluid_in.iloc[j,step], Result_df_soil.iloc[j,step-1])[0]
+                Result_df_fluid_out.iloc[j,step] = cur_Tin_and_power[0]
                 #get each BHE's power
-                Result_df_BHE_power.iloc[j,step] = mod_bhe.Type_1U_BHE_cal(
-                Result_df_fluid_in.iloc[j,step], Result_df_soil.iloc[j,step-1])[1]
+                Result_df_BHE_power.iloc[j,step] = cur_Tin_and_power[1]
                 #update the global sourceterm dataframe in module ILS
                 mod_ILS.st_dataframe(step,j, Result_df_BHE_power.iloc[j,step]/BHE_length)
             #determin if the Tout is converged

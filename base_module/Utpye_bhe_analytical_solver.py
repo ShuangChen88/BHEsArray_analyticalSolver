@@ -16,8 +16,8 @@
 import numpy as np
 
 
-def Type_1U_BHE_cal(Tin, Tsoil):
+def Type_1U_BHE_cal(Tin, Tsoil, f_r):
     return (10 +273.15,20 +273.15)
 
-def Type_1U_BHE_cal_singel(Power, Tsoil):
+def Type_1U_BHE_cal_singel(Power, Tsoil, f_r):
     return (10 +273.15,20 +273.15)

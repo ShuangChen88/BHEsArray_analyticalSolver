@@ -64,7 +64,8 @@ max_iter = 100
 
 for step in range(1, timestep_tot +1):
     t = step * delta_t
-    print('timestep = %d start' % step )
+    time_step_start = time.clock()
+    print('timestep = %d start:' % step )
     # equal power for all BHEs on the first thermal loading
     if step == 1:
         #update global dataframe BHE power
@@ -81,44 +82,62 @@ for step in range(1, timestep_tot +1):
         #update global dataframe soil temperature
         for j in range(BHE_num):
             Result_df_soil.iloc[j,1] = mod_ILS.ILS_solver(step,j)
+        #sys time info output
+        print('timestep %d took %.3f s' %(step, time.clock() - time_step_start))
     else:
         #picard iteration until Tout achieves converge
+        time_picard_iter_start = time.clock()
         for i in range(max_iter):
-            print('Iteration %d :' % i)
+            print('Picard iteration %d start:' % i)
             if i == max_iter - 1:
-                raise Exception('The iteration could not achieve converge within %d steps' % max_iter)
+                raise Exception('The picard iteration could not achieve converge within %d steps' % max_iter)
+                                
             #1st: TESPy solver
+            time_mod_nw_start = time.clock()
             if_converge, f_r, T_in = mod_nw.nw_solver(t,
                                       Result_df_fluid_in.iloc[:,step-1],
                                       Result_df_fluid_out.iloc[:,step-1])
+            #sys time info output
+            print('Solve tespy network took %.3f s' %(time.clock() - time_mod_nw_start))
             #update flowrate and Tin
             Result_df_BHE_f_r.iloc[:,step] = f_r
             Result_df_fluid_in.iloc[:,step] = T_in
+            
             #2nd: BHE solver
+            time_mod_bhe_start = time.clock()
             for j in range(BHE_num):#loop all BHEs
 #                TODO: mod_bhe two calculation sort
                 #get each BHE's Tout and power from the current timestep 
                 #Tin, flowrate and Tsoil from last timestep
-                cur_Tin_and_power = mod_bhe.Type_1U_BHE_cal(
+                cur_Tout_and_power = mod_bhe.Type_1U_BHE_cal(
                 Result_df_fluid_in.iloc[j,step], 
                 Result_df_soil.iloc[j,step-1],
                 Result_df_BHE_f_r.iloc[j,step])
                 #get each BHE's Tout
-                Result_df_fluid_out.iloc[j,step] = cur_Tin_and_power[0]
+                Result_df_fluid_out.iloc[j,step] = cur_Tout_and_power[0]
                 #get each BHE's power
-                Result_df_BHE_power.iloc[j,step] = cur_Tin_and_power[1]
+                Result_df_BHE_power.iloc[j,step] = cur_Tout_and_power[1]
                 #update the global sourceterm dataframe in module ILS
                 mod_ILS.st_dataframe(step,j, Result_df_BHE_power.iloc[j,step]/BHE_length)
+            #sys time info output
+            print('Solve BHE analytical solution for all BHEs took %.3f s' 
+                  %(time.clock() - time_mod_bhe_start))
             #determin if the Tout is converged
             if (if_converge):
+                #sys time info output
+                print('Picard iteration achieves converge at %d steps, the total total iteration took %.3f s'
+                      %(i, (time.clock() - time_picard_iter_start)))
                 break
+            
         #3nd: ILS solver
         #update global dataframe soil temperature
         for j in range(BHE_num):
             Result_df_soil.iloc[j,step] = mod_ILS.ILS_solver(step,j)
-                   
+        
+        #sys time info output
+        print('Timestep %d took %.3f s' %(step, time.clock() - time_step_start))
+        
 #solver time counter end
-time_solver_end = time.clock()
-print('total solver execution took', (time_solver_end - time_solver_start)/60, 'min' )
+print('total solver execution took', (time.clock() - time_solver_start)/60, 'min' )
 print('The whole computation terminated on', time.ctime() )
 

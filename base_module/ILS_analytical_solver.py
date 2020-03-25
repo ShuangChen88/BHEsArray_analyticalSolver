@@ -20,7 +20,7 @@ import base_module.geometry as geometry
 
 #%% basic input
 #soil
-T0 = 15 #soil initial temperature
+T0 = 273.15 + 15 #K soil initial temperature
 rho_s = 1120 #kg/m3
 c_s = 1780 #J/kg*K
 k_s = 2.4 #W/m*K

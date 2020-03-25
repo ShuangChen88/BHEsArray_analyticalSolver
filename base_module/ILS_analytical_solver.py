@@ -32,7 +32,7 @@ delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
 
 #BHE 
-BHE_num = 9
+BHE_num = 3
 BHE_wall_points_num = 4
 #power
 #create 3 dim dataframe to store the st_all for all BHE_wall_points

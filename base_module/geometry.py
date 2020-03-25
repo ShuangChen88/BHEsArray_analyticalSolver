@@ -8,20 +8,20 @@ import numpy as np
 #%% User setting
 #input geometry of the model
 
-bhe_num = 9#BHE number
+bhe_num = 3#BHE number
 adj = 6 # borehole adjacent distance in m
 coord_center_point = [0,100]#the absolute coordinate of the center point of the array
 
 
 #%% BHEs coordinates
 
-bhe_pos_x = np.array([-adj + coord_center_point[0],-adj + coord_center_point[0],-adj + coord_center_point[0],
-                       coord_center_point[0], coord_center_point[0], coord_center_point[0],
-                      adj + coord_center_point[0], adj + coord_center_point[0], adj + coord_center_point[0]],dtype=float)
+bhe_pos_x = np.array([-adj + coord_center_point[0],
+                       coord_center_point[0], 
+                      adj + coord_center_point[0]],dtype=float)
 
-bhe_pos_y = np.array([adj + coord_center_point[1],0 + coord_center_point[1],-adj + coord_center_point[1],
-                      adj + coord_center_point[1],0 + coord_center_point[1],-adj + coord_center_point[1],
-                      adj + coord_center_point[1],0 + coord_center_point[1],-adj + coord_center_point[1]],dtype=float)
+bhe_pos_y = np.array([coord_center_point[1],
+                      coord_center_point[1],
+                      coord_center_point[1]],dtype=float)
 
 #%% selected bohrehole wall location point 
 # each selected bhe has 4 around points, the calculated soil tempererature on the borhehole

@@ -19,7 +19,7 @@ delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
 
 #BHE
-BHE_num = 9
+BHE_num = 3
 BHE_length = 50 #m
 BHE_f_r = 0.5 #kg/s
 

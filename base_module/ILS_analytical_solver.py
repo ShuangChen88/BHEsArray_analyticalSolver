@@ -105,7 +105,7 @@ def ILS_solver(timestep, bhe_id):
     
     #get the selected BHE' average wall soil temperature by summarizing the
     #all 4 reference points temperature 
-    bhe_avg_soil_T = np.sum(T_domain[:,timestep-1],axis=0)/4
+    bhe_avg_soil_T = np.sum(T_domain[:,timestep-1],axis=0)/BHE_wall_points_num
     return bhe_avg_soil_T
 
     

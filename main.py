@@ -23,7 +23,7 @@ BHE_num = 3
 BHE_length = 50 #m
 #initial flowrate in each BHE, the global BHE flowrate curve 
 #is defined in bcs_tespy.py or tespy model
-BHE_f_r_ini = 0.5 #kg/s 
+BHE_f_r_ini = 0.2 #kg/s 
 
 #%%initialize
 ###main data containers initialise

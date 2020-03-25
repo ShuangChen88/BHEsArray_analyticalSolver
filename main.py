@@ -21,7 +21,9 @@ timestep_tot = int(time_tot/delta_t)
 #BHE
 BHE_num = 3
 BHE_length = 50 #m
-#BHE_f_r = 0.5 #kg/s #system pipe flowrate is defined in bcs_tespy.py or tespy model
+#initial flowrate in each BHE, the global BHE flowrate curve 
+#is defined in bcs_tespy.py or tespy model
+BHE_f_r_ini = 0.5 #kg/s 
 
 #%%initialize
 ###main data containers initialise
@@ -47,6 +49,8 @@ Result_df_fluid_in = pd.DataFrame(index=row_name, columns=col_name)
 Result_df_fluid_out = pd.DataFrame(index=row_name, columns=col_name)
 
 #parameters initialise
+#BHE flowrate
+Result_df_BHE_f_r += BHE_f_r_ini
 #soil
 T0 = mod_ILS.T0
 Result_df_soil.iloc[:,0] = T0
@@ -67,10 +71,10 @@ for step in range(1, timestep_tot +1):
         Result_df_BHE_power.iloc[:,1] = mod_nw.consumer_demand(0)/BHE_num
 #        TODO: mod_bhe two calculation sort
         #update global dataframe BHE inflow and out flow
-        Result_df_fluid_in.iloc[:,1] = mod_bhe.Type_1U_BHE_cal_singel(
-                Result_df_BHE_power.iloc[0,1], T0)[0]
-        Result_df_fluid_out.iloc[:,1] = mod_bhe.Type_1U_BHE_cal_singel(
-                Result_df_BHE_power.iloc[0,1], T0)[1]
+        fisrt_step_Tin_and_Tout = mod_bhe.Type_1U_BHE_cal_singel(
+                Result_df_BHE_power.iloc[0,1], T0, Result_df_BHE_f_r.iloc[0,1])
+        Result_df_fluid_in.iloc[:,1] = fisrt_step_Tin_and_Tout[0]
+        Result_df_fluid_out.iloc[:,1] = fisrt_step_Tin_and_Tout[1]
         #soil
         #global sourceterm dataframe in [W/m] in module ILS initialise ab timestep = 1
         mod_ILS.st_dataframe(1,0, Result_df_BHE_power.iloc[0,1]/BHE_length)
@@ -88,7 +92,7 @@ for step in range(1, timestep_tot +1):
                                       Result_df_fluid_in.iloc[:,step-1],
                                       Result_df_fluid_out.iloc[:,step-1])
             #update flowrate and Tin
-            Result_df_BHE_f_r[:,step] = f_r
+            Result_df_BHE_f_r.iloc[:,step] = f_r
             Result_df_fluid_in.iloc[:,step] = T_in
             #2nd: BHE solver
             for j in range(BHE_num):#loop all BHEs

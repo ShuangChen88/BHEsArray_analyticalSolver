@@ -116,7 +116,7 @@ heat.set_attr(P=-3000)  # W
 # system inlet
 inflow_head = 2  # bar
 
-fc_pu.set_attr(p=inflow_head, m=1.5, fluid={'water': 1})
+fc_pu.set_attr(p=inflow_head, m=0.6, fluid={'water': 1})
 
 # for BHEs:
 # Tout:

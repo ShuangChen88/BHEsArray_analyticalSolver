@@ -52,6 +52,7 @@ bhe_wall_pos_x = geometry.bhe_wall_pos_x
 bhe_wall_pos_y = geometry.bhe_wall_pos_y
 
 #%% functions
+#global sourceterm array data container
 def st_dataframe(step,BHE_id,st):
     #sourceterm dataframe starts from step = 1.
     cur_step = step - 1
@@ -61,11 +62,11 @@ def st_dataframe(step,BHE_id,st):
     for i in range(BHE_wall_points_num_all):
         st_all_global[i,BHE_id,cur_step] = st
 
-def ILS_solver(timestep):
-    T_domain=np.zeros([BHE_wall_points_num_all,timestep])
-    coeff_all = np.zeros([BHE_wall_points_num_all,BHE_num,timestep])
+#global coefficient data container(sourceterms to each reference point) of whole timesteps
+def ILS_solver_global_coeff():
+    coeff_all = np.zeros([BHE_wall_points_num_all,BHE_num,timestep_tot])
     
-    for currstep in range(0,timestep):
+    for currstep in range(0,timestep_tot):
         #data container
         dist_bhe_to_ref_po= np.zeros([BHE_wall_points_num_all,BHE_num])
         localcoeff= np.zeros([BHE_wall_points_num_all,BHE_num])
@@ -88,15 +89,20 @@ def ILS_solver(timestep):
                     localcoeff[j,i] = localcoeff[j,i] - 1/(4*math.pi*k_s)*n1  
         
         #reverse the coefficient order
-        coeff_all[:,:,1:]=coeff_all[:,:,:timestep-1]
+        coeff_all[:,:,1:]=coeff_all[:,:,:timestep_tot-1]
         #store each timestep's localcoefficient into global time coefficient dataframe
         coeff_all[:,:,0]= localcoeff 
         
-    # get the final temperature field by multiplying
+    return coeff_all
+    
+    
+def ILS_solver(timestep):
+    #soil wall temperature data container on the current timestep      
+    T_domain=np.zeros(BHE_wall_points_num_all)
+    # get the current timestep temperature field by multiplying
     #the global coefficinet dataframe with the sourceterm matrix 
-    for currstep in range(timestep):
-        T_domain[:,currstep] =  np.sum(np.sum(coeff_all[:,:,timestep-1-currstep:]
-                                *st_all_global[:,:,:currstep+1],axis=1),axis=1) + T0                              
+    T_domain[:] =  np.sum(np.sum(coeff_all[:,:,(timestep_tot - timestep):]
+                                *st_all_global[:,:,:timestep],axis=1),axis=1) + T0                              
     
     #get each BHE' average wall soil temperature by summarizing the
     #all 4 reference points temperature of each BHE. Then combine all BHEs
@@ -106,5 +112,9 @@ def ILS_solver(timestep):
     for i in range(BHE_num):
         bhes_avg_wallsoil_T_array[i] = np.sum(T_domain[i * BHE_wall_points_num:
                                                       (i + 1) * BHE_wall_points_num
-                                                ,timestep-1],axis=0)/BHE_wall_points_num
+                                                ])/BHE_wall_points_num
     return bhes_avg_wallsoil_T_array
+
+#%%initialise global coefficient data container. In the whole main calculation
+#procedure the global coefficinet array do not need to change.
+coeff_all = ILS_solver_global_coeff()

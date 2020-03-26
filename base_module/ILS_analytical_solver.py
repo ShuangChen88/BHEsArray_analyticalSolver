@@ -14,7 +14,6 @@ Author: Shuang Chen
 import numpy as np
 from scipy import special as sp
 import math
-import pandas as pd
 
 import base_module.geometry as geometry
 

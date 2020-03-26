@@ -73,10 +73,10 @@ for step in range(1, timestep_tot +1):
         Result_df_BHE_power.iloc[:,1] = mod_nw.consumer_demand(0)/BHE_num
 #        TODO: mod_bhe two calculation sort
         #update global dataframe BHE inflow and out flow
-        fisrt_step_Tin_and_Tout = mod_bhe.Type_1U_BHE_cal_singel(
+        first_step_Tin_and_Tout = mod_bhe.Type_1U_BHE_cal_singel(
                 Result_df_BHE_power.iloc[0,1], T0, Result_df_BHE_f_r.iloc[0,1])
-        Result_df_fluid_in.iloc[:,1] = fisrt_step_Tin_and_Tout[0]
-        Result_df_fluid_out.iloc[:,1] = fisrt_step_Tin_and_Tout[1]
+        Result_df_fluid_in.iloc[:,1] = first_step_Tin_and_Tout[0]
+        Result_df_fluid_out.iloc[:,1] = first_step_Tin_and_Tout[1]
         #soil
         #global sourceterm dataframe in [W/m] in module ILS initialise ab timestep = 1
         mod_ILS.st_dataframe(1,0, Result_df_BHE_power.iloc[0,1]/BHE_length)

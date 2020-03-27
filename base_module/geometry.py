@@ -4,25 +4,28 @@ Geometry of the analytical model
 bhe order: upperleft to upper right, upper to down
 '''
 import numpy as np
+from pandas import read_csv
 
 #%% User setting
 #input geometry of the model
 
 bhe_num = 3 #BHE number
 BHE_wall_points_num = 4 #4 reference points on each BHE wall
-adj = 6 # borehole adjacent distance in m
-coord_center_point = [0,100]#the absolute coordinate of the center point of the array
-
 
 #%% BHEs coordinates
+#note: the sequence of the BHEs should be same as the BHEs sequence defined in the tespy model
+#Read the coordinates from the BHE network csv
+df_nw = read_csv('./base_module/pre/bhe_network.csv',
+                    delimiter=';',
+                    index_col=[0],
+                    dtype={'data_index': str})
 
-bhe_pos_x = np.array([-adj + coord_center_point[0],
-                       coord_center_point[0], 
-                      adj + coord_center_point[0]],dtype=float)
+bhe_pos_x = np.zeros(bhe_num)
+bhe_pos_y = np.zeros(bhe_num)
 
-bhe_pos_y = np.array([coord_center_point[1],
-                      coord_center_point[1],
-                      coord_center_point[1]],dtype=float)
+for i in range(bhe_num):
+    bhe_pos_x[i] = df_nw.loc[df_nw.index[i],'coord_x']
+    bhe_pos_y[i] = df_nw.loc[df_nw.index[i],'coord_y']
 
 #%% selected bohrehole wall location point 
 # each selected bhe has 4 around points, the calculated soil tempererature on the borhehole

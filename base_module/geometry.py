@@ -12,6 +12,7 @@ from pandas import read_csv
 bhe_num = 3 #BHE number
 BHE_wall_points_num = 4 #4 reference points on each BHE wall
 
+#End User setting
 #%% BHEs coordinates
 #note: the sequence of the BHEs should be same as the BHEs sequence defined in the tespy model
 #Read the coordinates from the BHE network csv

@@ -11,7 +11,7 @@ import numpy as np
 from pandas import read_csv
 from tespy.networks import load_network
 
-#%% parameters
+#%% User setting
 # refrigerant parameters
 #refrig_density = 992.92  # kg/m3
 # switch for special boundary conditions
@@ -63,9 +63,7 @@ def dyn_frate(t):  # dynamic flowrate in BHE
     return month_frate[t_trans - 1]
 
 
-# End User setting+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
+# End User setting
 #%% create network dataframe
 def create_dataframe():
     # return dataframe

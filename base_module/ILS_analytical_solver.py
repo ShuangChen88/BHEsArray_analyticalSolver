@@ -17,7 +17,7 @@ import math
 
 import base_module.geometry as geometry
 
-#%% basic input
+#%% User setting
 #soil
 T0 = 273.15 + 15 #K soil initial temperature
 rho_s = 1120 #kg/m3
@@ -30,6 +30,8 @@ time_tot = 10*24*60*60 #s
 delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
 
+#End User setting
+#%%basic input
 #BHE 
 BHE_num = geometry.bhe_num
 BHE_wall_points_num = geometry.BHE_wall_points_num

@@ -13,7 +13,8 @@ import base_module.Utpye_bhe_analytical_solver as mod_bhe
 import base_module.bcs_tespy as mod_nw
 import post
 
-#%%main parameters
+#%% User setting
+#main parameters
 time_tot = 10*24*60*60 #s
 delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
@@ -21,10 +22,11 @@ timestep_tot = int(time_tot/delta_t)
 #BHE
 BHE_num = 3
 BHE_length = 50 #m
-#initial flowrate in each BHE, the global BHE flowrate curve 
-#is defined in bcs_tespy.py or tespy model
+#initial flowrate in each BHE, the global BHE flowrate curve is defined 
+#in bcs_tespy.py or tespy model
 BHE_f_r_ini = 0.2 #kg/s 
 
+# End User setting
 #%%initialize
 ###main data containers initialise,
 #col: BHE id (:BHE_num)

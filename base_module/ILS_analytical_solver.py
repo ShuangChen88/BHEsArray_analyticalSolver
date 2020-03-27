@@ -55,14 +55,15 @@ bhe_wall_pos_y = geometry.bhe_wall_pos_y
 
 #%% functions
 #global sourceterm array data container
-def st_dataframe(step,BHE_id,st):
+def st_dataframe(step,st):
     #sourceterm dataframe starts from step = 1.
     cur_step = step - 1
     #first step no need
     if cur_step == 0:
-        st_all_global[:,:,cur_step] = st
-    for i in range(BHE_wall_points_num_all):
-        st_all_global[i,BHE_id,cur_step] = st
+        st_all_global[:,:,cur_step] = st[0]
+    for i in range(BHE_num):
+        for j in range(BHE_wall_points_num_all):
+            st_all_global[j,i,cur_step] = st[i]
 
 #global coefficient data container(sourceterms to each reference point) of whole timesteps
 def ILS_solver_global_coeff():

@@ -81,7 +81,7 @@ for step in range(1, timestep_tot +1):
         Result_df_fluid_out[:,step] = first_step_Tin_and_Tout[1]
         #soil
         #global sourceterm dataframe in [W/m] in module ILS initialise ab timestep = 1
-        mod_ILS.st_dataframe(1,0, Result_df_BHE_power[0,1]/BHE_length)
+        mod_ILS.st_dataframe(1, Result_df_BHE_power[:,1]/BHE_length)
         #update global dataframe BHE' wall soil interface temperature
         Result_df_soil[:,step] = mod_ILS.ILS_solver(step)
         #sys time info output
@@ -119,8 +119,6 @@ for step in range(1, timestep_tot +1):
                 Result_df_fluid_out[j,step] = cur_Tout_and_power[0]
                 #get each BHE's power
                 Result_df_BHE_power[j,step] = cur_Tout_and_power[1]
-                #update the global sourceterm dataframe in module ILS
-                mod_ILS.st_dataframe(step,j, Result_df_BHE_power[j,step]/BHE_length)
             #sys time info output
             print('Solve BHE analytical solution for all BHEs took %.3f s' 
                   %(time.perf_counter() - time_mod_bhe_start))
@@ -132,6 +130,8 @@ for step in range(1, timestep_tot +1):
                 break
             
         #3nd: ILS solver
+        #update the global sourceterm dataframe in module ILS
+        mod_ILS.st_dataframe(step, Result_df_BHE_power[:,step]/BHE_length)
         #update global dataframe soil temperature
         Result_df_soil[:,step] = mod_ILS.ILS_solver(step)
         

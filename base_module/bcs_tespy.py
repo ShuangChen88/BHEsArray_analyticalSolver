@@ -110,7 +110,7 @@ def tespy_solver(t):
 
 
 #%% Tespy network model main solver function
-def nw_solver(t, Tin_val, Tout_val):
+def nw_solver(t, Tout_val):
     #system converge control
     if_success = False
     # network status:
@@ -130,13 +130,7 @@ def nw_solver(t, Tin_val, Tout_val):
             df_nw.loc[df_nw.index[i], 'Tout_val'] = Tout_val[i]
         # TESPy solver
         cur_cal_f_r_val, cur_cal_Tin_val = tespy_solver(t)
-        # check norm if network achieves the converge
-        pre_cal_Tin_val = Tin_val
-        norm = np.linalg.norm(
-            abs(np.asarray(pre_cal_Tin_val) - np.asarray(cur_cal_Tin_val)))
-        if norm < 10e-6:
-            if_success = True
-        # return to OGS
+        # return to main
         return (if_success, cur_cal_f_r_val, cur_cal_Tin_val)
 
 

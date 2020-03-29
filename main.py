@@ -87,8 +87,11 @@ for step in range(1, timestep_tot +1):
         #sys time info output
         print('timestep %d took %.3f s' %(step, time.perf_counter() - time_step_start))
     else:
-        #picard iteration until Tout achieves converge
+        #sys time info output      
         time_picard_iter_start = time.perf_counter()
+        #uses BHE Tout array from last step as the initial Tout in the current network calculation
+        Result_df_fluid_out[:,step] = Result_df_fluid_out[:,step - 1]
+        #picard iteration until Tout achieves converge  
         for i in range(max_iter):
             print('Picard iteration %d start:' % i)
             if i == max_iter - 1:
@@ -97,8 +100,7 @@ for step in range(1, timestep_tot +1):
             #1st: TESPy solver
             time_mod_nw_start = time.perf_counter()
             if_converge, f_r, T_in = mod_nw.nw_solver(t,
-                                      Result_df_fluid_in[:,step-1],
-                                      Result_df_fluid_out[:,step-1])
+                                      Result_df_fluid_out[:,step])
             #sys time info output
             print('Solve tespy network took %.3f s' %(time.perf_counter() - time_mod_nw_start))
             #update flowrate and Tin
@@ -107,6 +109,8 @@ for step in range(1, timestep_tot +1):
             
             #2nd: BHE solver
             time_mod_bhe_start = time.perf_counter()
+            #record the Tout array from last iteration for the next converge check
+            pre_BHEs_Tout = Result_df_fluid_out[:,step]
             for j in range(BHE_num):#loop all BHEs
 #                TODO: mod_bhe two calculation sort
                 #get each BHE's Tout and power from the current timestep 
@@ -123,6 +127,10 @@ for step in range(1, timestep_tot +1):
             print('Solve BHE analytical solution for all BHEs took %.3f s' 
                   %(time.perf_counter() - time_mod_bhe_start))
             #determin if the Tout is converged
+            #check norm if Tout array achieves the converge
+            norm = np.linalg.norm(abs((Result_df_fluid_out[:,step]) - pre_BHEs_Tout))
+            if norm < 10e-6:
+                if_converge = True
             if (if_converge):
                 #sys time info output
                 print('Picard iteration achieves converge at %d steps, the total total iteration took %.3f s'

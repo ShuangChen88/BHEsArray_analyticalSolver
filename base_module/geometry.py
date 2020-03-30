@@ -11,6 +11,7 @@ from pandas import read_csv
 
 bhe_num = 3 #BHE number
 BHE_wall_points_num = 4 #4 reference points on each BHE wall
+br = 0.075 # borehole raduis in m
 
 #End User setting
 #%% BHEs coordinates
@@ -31,7 +32,6 @@ for i in range(bhe_num):
 #%% selected bohrehole wall location point 
 # each selected bhe has 4 around points, the calculated soil tempererature on the borhehole
 # wall is the average temperature of the temperature at the 4 points in each timestep
-br = 0.075 # borehole raduis in m
 
 #create local variables of the components label and connections label in network
 localVars = locals()

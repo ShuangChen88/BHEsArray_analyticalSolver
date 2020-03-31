@@ -109,7 +109,7 @@ for step in range(1, timestep_tot +1):
             #2nd: BHE solver
             time_mod_bhe_start = time.perf_counter()
             #record the Tout array from last iteration for the next converge check
-            pre_BHEs_Tout = Result_df_fluid_out[:,step]
+            pre_BHEs_Tout = Result_df_fluid_out[:,step].copy()
             for j in range(BHE_num):#loop all BHEs
                 #get the jth BHE's Tout and power from the current timestep 
                 #Tin, flowrate and Tsoil from last timestep.
@@ -148,7 +148,7 @@ for step in range(1, timestep_tot +1):
         print('Timestep %d took %.3f s' %(step, time.perf_counter() - time_step_start))
         
 #solver time counter end
-print('total solver execution took', (time.perf_counter() - time_solver_start)/60, 'min' )
+print('total solver execution took', (time.perf_counter() - time_solver_start), 's' )
 
 #import post procedure
 post.output_csv(BHE_num, timestep_tot,

@@ -10,13 +10,11 @@ import math
 
 # function used to calculate the analytical solution
 # of temperature distribution in an around Borehole 
-# Heat Exchangers (BHE) proposed by Beier2014 
-#
+# Heat Exchangers (BHE) proposed by Beier2014 #
 # Richard A. Beier (2014) Transient heat transfer in a 
 # U-tube borehole heat exchanger, 
 # Applied Thermal Engineering 62: 256-266. 
-# http://dx.doi.org/10.1016/j.applthermaleng.2013.09.014
-#
+# http://dx.doi.org/10.1016/j.applthermaleng.2013.09.014 #
 # Author: Haibing Shao
 # Email:  haibing(dot)shao(at)gmail(dot)com
 
@@ -129,38 +127,44 @@ H_g = H_g * Vol_actual / Vol_model
 # to evaluate the dimensionless fluid inlet and outlet temperatures,  set zD = 0 
 z_D = 0.0
 # values of r_D and z_Dsand correspond to the location chosen to evaluate the temperature in the grout. 
-# values of r_D and z_Dsand correspond to the location chosen to evaluate  the temperature in the ground (sand). 
+# values of r_D and z_Dsand correspond to the location chosen to evaluate the temperature in the ground (sand).
 # set the location to evaluate temperature in soil
-z_Dsand = 0.5
-r_D = r_Db
-r_Dsand = (r_b + 0.024) / r_eq  # this is problematic
+# z_Dsand = 0.5
+# r_D = r_Db
+# r_Dsand = (r_b + 0.024) / r_eq  # this is problematic
 
-#%%functions
+# functions
 
-def result(N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_Dsand, z_D, z_Dsand, timeD):
+def result(N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDstart):
+    # ns = 12
+    # ncycles = 5
+    # ndiv = 10
+    # # zero out the data space
+    # rt = np.zeros((ncycles * ndiv, 8))
+    # # start calculating result
+    # for i in range(ncycles):
+    #     for j in range(ndiv):
+    #         tval = timeD[j] * 10 ** (i)
+    #         k = i * ndiv + j
+    #         rt[k, 0] = k
+    #         rt[k, 1] = tval
+    #         rt[k, 2] = Stehfest_inv_Lap(F_1, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D, ns)
+    #         rt[k, 3] = Stehfest_inv_Lap(F_2, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D, ns)
+    #         rt[k, 4] = Stehfest_inv_Lap(FS_1, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_Dsand, ns)
+    #         rt[k, 5] = Stehfest_inv_Lap(FG_1, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_Db, z_Dsand,ns)
+    #         rt[k, 6] = Stehfest_inv_Lap(FS_2, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_Dsand, ns)
+    #         rt[k, 7] = Stehfest_inv_Lap(FG_2, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_Db, z_Dsand,ns)
     ns = 12
-    ncycles = 5
-    ndiv = 10
-    # zero out the data space
-    rt = np.zeros((ncycles * ndiv, 8))
-    # start calculating result
-    for i in range(ncycles):
-        for j in range(ndiv):
-            tval = timeD[j] * 10 ** (i)
-            k = i * ndiv + j
-            rt[k, 0] = k
-            rt[k, 1] = tval
-            rt[k, 2] = Stehfest_inv_Lap(F_1, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D, ns)
-            rt[k, 3] = Stehfest_inv_Lap(F_2, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D, ns)
-            rt[k, 4] = Stehfest_inv_Lap(FS_1, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_Dsand, ns)
-            rt[k, 5] = Stehfest_inv_Lap(FG_1, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_Db, z_Dsand,ns)
-            rt[k, 6] = Stehfest_inv_Lap(FS_2, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_Dsand, ns)
-            rt[k, 7] = Stehfest_inv_Lap(FG_2, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_Db, z_Dsand,ns)
+    tval = timeDstart
+    rt = np.zeros((3))
+    rt[0] = tval # Fourier time
+    rt[1] = Stehfest_inv_Lap(F_1, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, ns) # inlet temperature at given time
+    rt[2] = Stehfest_inv_Lap(F_2, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, ns) # outlet temperature at given time
     return rt
 
 
 # This function is performing the numerical inversion of Laplace transformation using the Stehfest algorithm;
-def Stehfest_inv_Lap(funcHandle, time, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D, ns):
+def Stehfest_inv_Lap(funcHandle, time, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, ns):
     # ns is the number of terms to be used. Number of terms must be even. 
     nh = ns / 2
     v = np.zeros((ns, 1))
@@ -188,14 +192,14 @@ def Stehfest_inv_Lap(funcHandle, time, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A
     A = math.log(2) / time
     TD = float(0)
     for i in range(1, ns + 1):
-        TD = TD + float(v[i - 1, 0]) * funcHandle(float(i * A), N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D)
+        TD = TD + float(v[i - 1, 0]) * funcHandle(float(i * A), N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D)
     TD = float(A) * TD
     rt = TD
     return rt
 
 
 # This function correspons to T_D1(z,s); Eq.(A.17)
-def F_1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D):
+def F_1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D):
     rt = C_1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db) * math.exp(
         a1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db) * z_D) + C_2(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa,
                                                                               A_D, r_Db) * math.exp(
@@ -204,7 +208,7 @@ def F_1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D):
 
 
 # This function correspons to T_D2(zD,s); Eq.(A.18)
-def F_2(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D):
+def F_2(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D):
     rt = C_3(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db) * math.exp(
         a1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db) * z_D) + C_4(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa,
                                                                               A_D, r_Db) * math.exp(
@@ -213,55 +217,55 @@ def F_2(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D):
 
 
 # This function correspons to T_Dg1(rD,zD,s); Eq.(32) with Eq.(A.31) for B11(zD) and Eq.(A.8) for B21/B11)
-def FG_1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D):
-    numerator = F_1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D) * 2 * N_w1 / (kappa * N_s) * (
-            sp.i0(r_D * math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa, r_Db) * sp.k0(r_D * math.sqrt(s)))
-    denominator = 2 * N_w1 / (kappa * N_s) * (
-            sp.i0(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa, r_Db) * sp.k0(math.sqrt(H_g * s / kappa))) + (
-                      -1) * math.sqrt(H_g * s / kappa) * sp.i1(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa,
-                                                                                                  r_Db) * math.sqrt(
-        H_g * s / kappa) * sp.k1(math.sqrt(H_g * s / kappa))
-    rt = numerator / denominator
-    return rt
+# def FG_1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D):
+#     numerator = F_1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D) * 2 * N_w1 / (kappa * N_s) * (
+#             sp.i0(r_D * math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa, r_Db) * sp.k0(r_D * math.sqrt(s)))
+#     denominator = 2 * N_w1 / (kappa * N_s) * (
+#             sp.i0(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa, r_Db) * sp.k0(math.sqrt(H_g * s / kappa))) + (
+#                       -1) * math.sqrt(H_g * s / kappa) * sp.i1(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa,
+#                                                                                                   r_Db) * math.sqrt(
+#         H_g * s / kappa) * sp.k1(math.sqrt(H_g * s / kappa))
+#     rt = numerator / denominator
+#     return rt
 
 
 # This function correspons to T_Dg2(rD,zD,s); Eq.(32) with Eq.(A.31) for B11(zD) and Eq.(A.8) for B22/B12)
-def FG_2(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D):
-    numerator = F_2(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D) * 2 * N_w2 / (kappa * N_s) * (
-            sp.i0(r_D * math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa, r_Db) * sp.k0(r_D * math.sqrt(s)))
-    denominator = 2 * N_w2 / (kappa * N_s) * (
-            sp.i0(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa, r_Db) * sp.k0(math.sqrt(H_g * s / kappa))) + (
-                      -1) * math.sqrt(H_g * s / kappa) * sp.i1(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa,
-                                                                                                  r_Db) * math.sqrt(
-        H_g * s / kappa) * sp.k1(math.sqrt(H_g * s / kappa))
-    rt = numerator / denominator
-    return rt
+# def FG_2(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D):
+#     numerator = F_2(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D) * 2 * N_w2 / (kappa * N_s) * (
+#             sp.i0(r_D * math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa, r_Db) * sp.k0(r_D * math.sqrt(s)))
+#     denominator = 2 * N_w2 / (kappa * N_s) * (
+#             sp.i0(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa, r_Db) * sp.k0(math.sqrt(H_g * s / kappa))) + (
+#                       -1) * math.sqrt(H_g * s / kappa) * sp.i1(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa,
+#                                                                                                   r_Db) * math.sqrt(
+#         H_g * s / kappa) * sp.k1(math.sqrt(H_g * s / kappa))
+#     rt = numerator / denominator
+#     return rt
 
 
 # This function correspons to T_Ds1(rD,zD,s); Eq. (33) combined with Eq.(A.31) for B11(zD);
-def FS_1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D):
-    T_bar_D1 = F_1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D)
-    B11 = 2 * N_w1 / kappa / N_s * T_bar_D1
-    B11 = B11 / (2 * N_w1 / (kappa * N_s) * (sp.i0(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa, r_Db) * sp.k0(
-        math.sqrt(H_g * s / kappa))) - math.sqrt(H_g * s / kappa) * sp.i1(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g,
-                                                                                                             kappa,
-                                                                                                             r_Db) * sp.k1(
-        math.sqrt(H_g * s / kappa)))
-    rt = B11 * B4B1(s, H_g, kappa, r_Db) * sp.k0(r_D * math.sqrt(s))
-    return rt
+# def FS_1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D):
+#     T_bar_D1 = F_1(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D)
+#     B11 = 2 * N_w1 / kappa / N_s * T_bar_D1
+#     B11 = B11 / (2 * N_w1 / (kappa * N_s) * (sp.i0(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa, r_Db) * sp.k0(
+#         math.sqrt(H_g * s / kappa))) - math.sqrt(H_g * s / kappa) * sp.i1(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g,
+#                                                                                                              kappa,
+#                                                                                                              r_Db) * sp.k1(
+#         math.sqrt(H_g * s / kappa)))
+#     rt = B11 * B4B1(s, H_g, kappa, r_Db) * sp.k0(r_D * math.sqrt(s))
+#     return rt
 
 
 # This function correspons to T_Ds2(rD,zD,s); Eq. (33) combined with Eq.(A.31) for B12(zD);
-def FS_2(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D):
-    T_bar_D2 = F_2(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D)
-    B12 = 2 * N_w1 / kappa / N_s * T_bar_D2
-    B12 = B12 / (2 * N_w1 / (kappa * N_s) * (sp.i0(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa, r_Db) * sp.k0(
-        math.sqrt(H_g * s / kappa))) - math.sqrt(H_g * s / kappa) * sp.i1(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g,
-                                                                                                             kappa,
-                                                                                                             r_Db) * sp.k1(
-        math.sqrt(H_g * s / kappa)))
-    rt = B12 * B4B1(s, H_g, kappa, r_Db) * sp.k0(r_D * math.sqrt(s))
-    return rt
+# def FS_2(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D):
+#     T_bar_D2 = F_2(s, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_D, z_D)
+#     B12 = 2 * N_w1 / kappa / N_s * T_bar_D2
+#     B12 = B12 / (2 * N_w1 / (kappa * N_s) * (sp.i0(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g, kappa, r_Db) * sp.k0(
+#         math.sqrt(H_g * s / kappa))) - math.sqrt(H_g * s / kappa) * sp.i1(math.sqrt(H_g * s / kappa)) + B2B1(s, H_g,
+#                                                                                                              kappa,
+#                                                                                                              r_Db) * sp.k1(
+#         math.sqrt(H_g * s / kappa)))
+#     rt = B12 * B4B1(s, H_g, kappa, r_Db) * sp.k0(r_D * math.sqrt(s))
+#     return rt
 
 
 # This function is according to Eq. (A.12b) It gives the same expression used for i=1 an i=2.
@@ -389,7 +393,7 @@ def Type_1U_BHE_cal(BHE_id, Tin, Tsoil, f_r_cur, f_r_pre):
     global w, global_coeff_Tin, global_coeff_Tout
     #determine if the hydraulic status in the BHE is changed
     if f_r_cur == f_r_pre:# hydraulic status unchanged
-        Power = ((2 * math.pi * k_s * Len)*(T_in - Tsoil))/global_coeff_Tin[BHE_id]
+        Power = ((2 * math.pi * k_s * Len)*(T_in + 273.15 - Tsoil))/global_coeff_Tin[BHE_id]
         Tout = Power * global_coeff_Tout[BHE_id] / (2 * math.pi * k_s * Len) + Tsoil
     else:
         #update flow rate
@@ -400,34 +404,36 @@ def Type_1U_BHE_cal(BHE_id, Tin, Tsoil, f_r_cur, f_r_pre):
         global_coeff_Tout[BHE_id] = result(N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, 
                         A_D, r_Db, r_Dsand, z_D, z_Dsand, timeDfirst)[:, 3][0]
         #get the BHE's power and Tout
-        Power = ((2 * math.pi * k_s * Len)*(T_in - Tsoil))/global_coeff_Tin[BHE_id]
+        Power = ((2 * math.pi * k_s * Len)*(T_in + 273.15 - Tsoil))/global_coeff_Tin[BHE_id]
         Tout = Power * global_coeff_Tout[BHE_id] / (2 * math.pi * k_s * Len) + Tsoil
 
     return (Tout, Power)
-#%%main
+# main
 # calculate the dimensionless time tD1
-ndiv = 10
-ncycles = 5
-timeDstart = 0.02
-xincr = 1.0 / ndiv
-iid = np.transpose([np.arange(ndiv + 1)])
-expon_id = xincr * iid
-timeDfirst = np.zeros((ndiv + 1, 1))
-for i in range(ndiv + 1):
-    timeDfirst[i] = 10 ** expon_id[i] * timeDstart
-
+# ndiv = 10
+# ncycles = 5
+# timeDstart = 0.02
+# xincr = 1.0 / ndiv
+# iid = np.transpose([np.arange(ndiv + 1)])
+# expon_id = xincr * iid
+# timeDfirst = np.zeros((ndiv + 1, 1))
+# for i in range(ndiv + 1):
+#     timeDfirst[i] = 10 ** expon_id[i] * timeDstart
+# Fourier time at given time step
+timeDstart = (k_s*86400)/(c_s*r_eq**2)
 # calculate dimensionless temperature as a function of dimensionless time
 # TD1 = dimensionless temperature
 # DD1 = dimensionless temperature derivative
 # tD1 = dimensionless time (Fourier number)
-RD = result(N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_Dsand, z_D, z_Dsand, timeDfirst)
+# RD = result(N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, r_Dsand, z_D, z_Dsand, timeDfirst)
+RD = result(N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDstart)
 # print(RD)
 # convert from dimensionless Temperature to the real temperature
 # TD1 and TD2 are the dimensionless temperature
-TD1 = RD[:, 2]
-TD2 = RD[:, 3]
+TD1 = RD[1]
+TD2 = RD[2]
 # tD1 is the dimensionless time
-tD1 = RD[:, 1]
+tD1 = RD[0]
 # =============================================================================
 # TDS1 = RD[:, 4]
 # TGS1 = RD[:, 5]
@@ -445,5 +451,5 @@ tD1 = RD[:, 1]
 #print('For the given inlet temperature', T_in, ', the BHE power is', Q , 'W, the outlet temperature is ',T_out)
 # =============================================================================
 #%% initialise TD1 and TD2 coefficient for inflow and outflow termperature of each BHEs
-global_coeff_Tin = np.zeros(BHE_num) + TD1[0]
-global_coeff_Tout= np.zeros(BHE_num) + TD2[0]
+global_coeff_Tin = np.zeros(BHE_num) + TD1
+global_coeff_Tout= np.zeros(BHE_num) + TD2

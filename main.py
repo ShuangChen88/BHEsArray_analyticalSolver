@@ -33,16 +33,16 @@ BHE_f_r_ini = 0.2 #kg/s
 #row: timestep (:timestep_tot+1), timestep = 0 means initial condition
 
 #create the data containers
-##soil: BHE' wall soil interface temperature
+##soil: BHE' wall soil interface temperature in [K]
 Result_df_soil = np.zeros((BHE_num, timestep_tot+1))
 ##BHE
-#power
+#power in [W]
 Result_df_BHE_power = np.zeros((BHE_num, timestep_tot+1))
-#refrigerant flowrate
+#refrigerant flowrate in [kg/s]
 Result_df_BHE_f_r = np.zeros((BHE_num, timestep_tot+1))
-#inflow T
+#inflow T in [K]
 Result_df_fluid_in = np.zeros((BHE_num, timestep_tot+1))
-#outflow T
+#outflow T in [K]
 Result_df_fluid_out = np.zeros((BHE_num, timestep_tot+1))
 
 #parameters initialise
@@ -73,7 +73,6 @@ for step in range(1, timestep_tot +1):
     if step == 1:
         #update global dataframe BHE power
         Result_df_BHE_power[:,step] = mod_nw.consumer_demand(0)/BHE_num
-#        TODO: mod_bhe two calculation sort
         #update global dataframe BHE inflow and out flow
         first_step_Tin_and_Tout = mod_bhe.Type_1U_BHE_cal_singel(
                 Result_df_BHE_power[0,step], T0, Result_df_BHE_f_r[0,step])
@@ -104,7 +103,7 @@ for step in range(1, timestep_tot +1):
             #sys time info output
             print('Solve tespy network took %.3f s' %(time.perf_counter() - time_mod_nw_start))
             #update flowrate and Tin
-            Result_df_BHE_f_r[:,step] = f_r
+            Result_df_BHE_f_r[:,step] = np.around(f_r, decimals=5)#flow rate in 5 significant digits
             Result_df_fluid_in[:,step] = T_in
             
             #2nd: BHE solver
@@ -112,13 +111,15 @@ for step in range(1, timestep_tot +1):
             #record the Tout array from last iteration for the next converge check
             pre_BHEs_Tout = Result_df_fluid_out[:,step]
             for j in range(BHE_num):#loop all BHEs
-#                TODO: mod_bhe two calculation sort
-                #get each BHE's Tout and power from the current timestep 
-                #Tin, flowrate and Tsoil from last timestep
-                cur_Tout_and_power = mod_bhe.Type_1U_BHE_cal(
+                #get the jth BHE's Tout and power from the current timestep 
+                #Tin, flowrate and Tsoil from last timestep.
+                #transfer the last step's flow rate of the BHE to determine if
+                #the hydraulic coefficients need to be updated in the selected BHE
+                cur_Tout_and_power = mod_bhe.Type_1U_BHE_cal(j,
                 Result_df_fluid_in[j,step], 
-                Result_df_soil[j,step-1],
-                Result_df_BHE_f_r[j,step])
+                Result_df_soil[j,step - 1],
+                Result_df_BHE_f_r[j,step],
+                Result_df_BHE_f_r[j,step - 1])
                 #get each BHE's Tout
                 Result_df_fluid_out[j,step] = cur_Tout_and_power[0]
                 #get each BHE's power

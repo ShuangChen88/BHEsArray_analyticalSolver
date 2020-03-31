@@ -20,6 +20,8 @@ import math
 # Author: Haibing Shao
 # Email:  haibing(dot)shao(at)gmail(dot)com
 
+
+BHE_num = 3 #BHEs number
 # set length of the borehole
 Len = 50  # unit meter
 # set input heat rate
@@ -40,9 +42,11 @@ alpha_s = k_s / c_s
 # property of the BHE
 # borehole radius
 r_b = 0.075  # unit m ni
+#parameeter of the refrigerant
+rho_f = 1052 # kg/m3
 # set circulating water rate
 #w = 0.1 * 4.428 / 1052  # unit m3/sec rho
-w = 0.2 / 1000  # unit m3/sec
+w = 0.2 / rho_f  # unit m3/sec
 # heat capacity of circulating water
 c_f = 3795 * 1052  # unit J/K/m3
 # set dimensions and properties of U-tube pipe
@@ -373,15 +377,32 @@ def beta(s, N_s, N_w1, N_w2, H_g, H_f, kappa, A_D, r_Db):
     return rt
 
 
-# interface functions to main.py calculation procedure
+# interface functions to main.py calculation procedure for the first timestep
 def Type_1U_BHE_cal_singel(Power, Tsoil, f_r):
     Tin = Power * global_coeff_Tin / (2 * math.pi * k_s * Len) + Tsoil
     Tout = Power * global_coeff_Tout / (2 * math.pi * k_s * Len) + Tsoil
     return (Tin,Tout)
 
-def Type_1U_BHE_cal(Tin, Tsoil, f_r):
-    Power = ((2 * math.pi * k_s * Len)*(T_in - Tsoil))/global_coeff_Tin
-    Tout = Power * global_coeff_Tout / (2 * math.pi * k_s * Len) + Tsoil
+# interface functions to main.py calculation procedure after the first timestep
+def Type_1U_BHE_cal(BHE_id, Tin, Tsoil, f_r_cur, f_r_pre):
+    #set flow rate, hydraulic coefficient as global variables
+    global w, global_coeff_Tin, global_coeff_Tout
+    #determine if the hydraulic status in the BHE is changed
+    if f_r_cur == f_r_pre:# hydraulic status unchanged
+        Power = ((2 * math.pi * k_s * Len)*(T_in - Tsoil))/global_coeff_Tin[BHE_id]
+        Tout = Power * global_coeff_Tout[BHE_id] / (2 * math.pi * k_s * Len) + Tsoil
+    else:
+        #update flow rate
+        w = f_r_cur / rho_f
+        #update the current BHE's hydraulic coefficient in the global_coeff_Tin
+        global_coeff_Tin[BHE_id] = result(N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, 
+                        A_D, r_Db, r_Dsand, z_D, z_Dsand, timeDfirst)[:, 2][0]
+        global_coeff_Tout[BHE_id] = result(N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, 
+                        A_D, r_Db, r_Dsand, z_D, z_Dsand, timeDfirst)[:, 3][0]
+        #get the BHE's power and Tout
+        Power = ((2 * math.pi * k_s * Len)*(T_in - Tsoil))/global_coeff_Tin[BHE_id]
+        Tout = Power * global_coeff_Tout[BHE_id] / (2 * math.pi * k_s * Len) + Tsoil
+
     return (Tout, Power)
 #%%main
 # calculate the dimensionless time tD1
@@ -423,6 +444,6 @@ tD1 = RD[:, 1]
 #print('For the given initial power', Q0, 'W, the inlet  temperature is', T1[0],'and outlet temperature is', T2[0])
 #print('For the given inlet temperature', T_in, ', the BHE power is', Q , 'W, the outlet temperature is ',T_out)
 # =============================================================================
-#%% initialise TD1 and TD2 coefficient for inflow and outflow termperature
-global_coeff_Tin = TD1[0]
-global_coeff_Tout= TD2[0]
+#%% initialise TD1 and TD2 coefficient for inflow and outflow termperature of each BHEs
+global_coeff_Tin = np.zeros(BHE_num) + TD1[0]
+global_coeff_Tout= np.zeros(BHE_num) + TD2[0]

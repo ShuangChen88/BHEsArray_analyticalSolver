@@ -98,9 +98,9 @@ pu.set_attr(flow_char=dc_cc(func=char, is_set=True))
 pu.set_attr(eta_s=0.90)
 
 # bhes
-bhe1.set_attr(D=0.013665, L=100, ks=0.00001)
-bhe2.set_attr(D=0.013665, L=100, ks=0.00001)
-bhe3.set_attr(D=0.013665, L=100, ks=0.00001)
+bhe1.set_attr(D=0.0137, L=100, ks=0.00001)
+bhe2.set_attr(D=0.0137, L=100, ks=0.00001)
+bhe3.set_attr(D=0.0137, L=100, ks=0.00001)
 
 # consumer
 cons.set_attr(D=0.2, L=20, ks=0.00001)

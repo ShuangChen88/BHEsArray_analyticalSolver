@@ -129,8 +129,12 @@ for step in range(1, timestep_tot +1):
                   %(time.perf_counter() - time_mod_bhe_start))
             #determin if the Tout is converged
             #check norm if Tout array achieves the converge
-            norm = np.linalg.norm(abs((Result_df_fluid_out[:,step]) - pre_BHEs_Tout))
-            if norm < 10e-6:
+            norm_delta_x = np.linalg.norm(abs((Result_df_fluid_out[:,step]) - pre_BHEs_Tout))
+            norm_x = np.linalg.norm(abs(Result_df_fluid_out[:,step]))
+            #sys time info output
+            print('Convergence criterion: |dx|=%.3e, |x|=%.3e, |dx|/|x|=%.3e'
+                  %(norm_delta_x, norm_x, norm_delta_x/norm_x))
+            if (norm_delta_x/norm_x) < 10e-6:
                 if_converge = True
             if (if_converge):
                 #sys time info output

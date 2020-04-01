@@ -40,15 +40,16 @@ def network_status(t):
 # dynamic consumer thermal load
 def consumer_demand(t):  # dynamic thermal demand from consumer
     # time conversion
-    t_trans = int((t - 1) / 86400 ) + 1
+    t_trans = int((t - 1) / 86400 / 30) + 1
     if t_trans > 12:
         t_trans = t_trans - 12 * (int(t_trans / 12))
     # thermal demand in each month (assumed specific heat extraction rate*
     # length of BHE* number of BHE)
     month_demand = [
-        -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, 
-        25 * 50 * 3, 25 * 50 * 3, 25 * 50 * 3, 25 * 50 * 3, 25 * 50 * 3
-           ]
+        -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3,
+        -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3,
+        -25 * 50 * 3, -25 * 50 * 3
+    ]
     return month_demand[t_trans - 1]
 
 

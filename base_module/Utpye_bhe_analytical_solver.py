@@ -33,7 +33,7 @@ Len = 50  # unit meter
 # BHE inlet temperature
 T_in = 10
 # initial soil temperature
-T_s = 15
+T_s = 12
 
 # property of the ground
 k_s = 2.4  # heat conductivity of soil. Unit W/m/K
@@ -43,33 +43,32 @@ alpha_s = k_s / c_s
 
 # property of the BHE
 # borehole radius
-r_b = 0.075  # unit m ni
+r_b = 0.063  # unit m ni
 #parameeter of the refrigerant
-rho_f = 998 # kg/m3
+rho_f = 992 # kg/m3
 # set circulating water rate
 #w = 0.1 * 4.428 / 1052  # unit m3/sec rho
 w = 0.2 / rho_f  # unit m3/sec
 # heat capacity of circulating water
-c_f = 3795 * 1052  # unit J/K/m3
+c_f = 4198 * rho_f  # unit J/K/m3
 # set dimensions and properties of U-tube pipe
 d_po = 0.0167  # outer pipe diameter, unit m
 d_pi = 0.0137  # inner pipe diameter, unit m
-k_p = 0.43  # heat conductivity of pipe, unit W/m/K
+k_p = 0.39  # heat conductivity of pipe, unit W/m/K
 
 # property of grout
-c_g = 3.9e6  # heat capacity of grout. unit J/K/m3
-k_g = 1.4  # heat conductivity of grout. unit W/m/K
+c_g = 2190*1735.160  # heat capacity of grout. unit J/K/m3
+k_g = 0.806  # heat conductivity of grout. unit W/m/K
 
 # calculate the convective film resistance inside pipe
 v_pi = w / (math.pi / 4 * d_pi * d_pi)
-mu_f = 0.52e-2  # unit kg/m/s
-rho_f = 1052  # unit kg/m3
+mu_f = 0.0067418  # unit kg/m/s
 
 # Reynolds number
 Re = rho_f * v_pi * d_pi / mu_f
 
 # estimate film coefficients by the Gnielinski correlation
-k_f = 0.48  # unit W/m/K
+k_f = 0.62863  # unit W/m/K
 Pr = mu_f / rho_f / alpha_s
 # Churchill correlation for friction factor Eq.(B.4)
 f = 1 / (1 / ((8 / Re) ** 10 + (Re / 36500) ** 20) ** 0.5 + (2.21 * math.log(Re / 7)) ** 10) ** 0.2
@@ -86,7 +85,7 @@ else:
 h_pi = k_f * Nu / d_pi  # unit: W/m2/K
 
 # evaluate shunt resistance for the heat transfer between fluids in two pipes
-shank = 0.075 / 2  # m
+shank = r_b / 2  # m
 # grout resistance fro shunt path Eq.(35)
 R_gshunt = np.arccosh(2 * shank * shank / (d_po / 2) ** 2 - 1) / (2 * math.pi * k_g)
 # Assign convective film coefficient on 1/2 of inside pipe wall area as corresponding to shunt resistance See Eq.(36)

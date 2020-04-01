@@ -11,7 +11,7 @@ from pandas import read_csv
 
 bhe_num = 3 #BHE number
 BHE_wall_points_num = 4 #4 reference points on each BHE wall
-br = 0.075 # borehole raduis in m
+br = 0.063 # borehole raduis in m
 
 #End User setting
 #%% BHEs coordinates

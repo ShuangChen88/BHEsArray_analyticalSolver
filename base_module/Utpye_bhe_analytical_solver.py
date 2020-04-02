@@ -45,12 +45,12 @@ alpha_s = k_s / c_s
 # borehole radius
 r_b = 0.063  # unit m ni
 #parameeter of the refrigerant
-rho_f = 992 # kg/m3
+rho_f = 1000 # kg/m3
 # set circulating water rate
 #w = 0.1 * 4.428 / 1052  # unit m3/sec rho
 w = 0.2 / rho_f  # unit m3/sec
 # heat capacity of circulating water
-c_f = 4198 * rho_f  # unit J/K/m3
+c_f = 4204.436 * rho_f  # unit J/K/m3
 # set dimensions and properties of U-tube pipe
 d_po = 0.0167  # outer pipe diameter, unit m
 d_pi = 0.0137  # inner pipe diameter, unit m

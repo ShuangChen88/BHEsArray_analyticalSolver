@@ -29,7 +29,7 @@ Len = 50  # unit meter
 # set input heat rate
 # positive Q means heating up the soil
 # negative Q means cooling down.
-#Q0 = -4000 # unit power watt
+# Q0 = -25*50 # unit power watt
 # BHE inlet temperature
 T_in = 10
 # initial soil temperature
@@ -383,6 +383,17 @@ def beta(s, N_s, N_w1, N_w2, H_g, H_f, kappa, A_D, r_Db):
                                                                                                 kappa, r_Db)
     return rt
 
+def zresult(nz, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDstart):
+    ns = 12
+    rt = np.zeros((nz, 4))
+    for i in range(nz):
+        z_D = (i+1)/nz
+        tval = timeDstart
+        rt[i,0] = i
+        rt[i,1] = z_D
+        rt[i,2] = Stehfest_inv_Lap(F_1, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, ns)  # inlet temperature at given time
+        rt[i,3] = Stehfest_inv_Lap(F_2, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, ns)  # outlet temperature at given time
+    return rt
 
 # interface functions to main.py calculation procedure for the first timestep
 def Type_1U_BHE_cal_singel(Power, Tsoil, f_r):
@@ -411,6 +422,25 @@ def Type_1U_BHE_cal(BHE_id, T_in, T_soil, f_r_cur, f_r_pre):
         Tout = Power * global_coeff_Tout[BHE_id] / (2 * math.pi * k_s * Len) + T_soil
 
     return (Tout, Power)
+
+# calculate fluid temperature distribution at the axial direction of borehole
+def Type_1U_BHE_tDist(Power, T_soil, nz, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDstart):
+    zRD = zresult(nz, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDstart)
+    # TD1 and TD2 are the dimensionless temperature
+    zD = zRD[:, 1]
+    zTD1 = zRD[:, 2]
+    zTD2 = zRD[:, 3]
+    H = np.zeros((nz))
+    T1z = np.zeros((nz))
+    T2z = np.zeros((nz))
+    # evaluate the fluid temperatures at the axial direction from correspnding dimensionless variables
+    for iz in range(nz):
+        H[iz] = Len * zD[iz]
+        T1z[iz] = Power * zTD1[iz] / (2 * math.pi * k_s * Len) + T_soil
+        T2z[iz] = Power * zTD2[iz] / (2 * math.pi * k_s * Len) + T_soil
+
+    return (H, T1z, T2z)
+
 # main
 # calculate the dimensionless time tD1
 # ndiv = 10
@@ -443,7 +473,9 @@ tD1 = RD[0]
 # TDS2 = RD[:, 6]
 # TGS2 = RD[:, 7]
 # =============================================================================
-
+#t = (tD1 * c_s * (r_eq) ** 2 / k_s) * 3600  # this is in seconds
+#T1 = Q0 * TD1 / (2 * math.pi * k_s * Len) + T_s
+#T2 = Q0 * TD2 / (2 * math.pi * k_s * Len) + T_s
 # evaluate the inlet & outlet temperatures and power from correspnding dimensionless variables
 #t = (tD1 * c_s * (r_eq) ** 2 / k_s) * 3600  # this is in seconds
 #T1 = Q0 * TD1 / (2 * math.pi * k_s * Len) + T_s
@@ -453,6 +485,6 @@ tD1 = RD[0]
 #print('For the given initial power', Q0, 'W, the inlet  temperature is', T1[0],'and outlet temperature is', T2[0])
 #print('For the given inlet temperature', T_in, ', the BHE power is', Q , 'W, the outlet temperature is ',T_out)
 # =============================================================================
-#%% initialise TD1 and TD2 coefficient for inflow and outflow termperature of each BHEs
+# initialise TD1 and TD2 coefficient for inflow and outflow termperature of each BHEs
 global_coeff_Tin = np.zeros(BHE_num) + TD1
 global_coeff_Tout= np.zeros(BHE_num) + TD2

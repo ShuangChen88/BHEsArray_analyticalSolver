@@ -31,9 +31,9 @@ Len = 50  # unit meter
 # negative Q means cooling down.
 # Q0 = -25*50 # unit power watt
 # BHE inlet temperature
-T_in = 10
+#T_in = 10
 # initial soil temperature
-T_s = 12
+#T_s = 12
 
 # property of the ground
 k_s = 2.4  # heat conductivity of soil. Unit W/m/K
@@ -44,21 +44,22 @@ alpha_s = k_s / c_s
 # property of the BHE
 # borehole radius
 r_b = 0.063  # unit m ni
-#parameeter of the refrigerant
-rho_f = 1000 # kg/m3
-# set circulating water rate
-#w = 0.1 * 4.428 / 1052  # unit m3/sec rho
-w = 0.2 / rho_f  # unit m3/sec
-# heat capacity of circulating water
-c_f = 4204.436 * rho_f  # unit J/K/m3
 # set dimensions and properties of U-tube pipe
 d_po = 0.0167  # outer pipe diameter, unit m
 d_pi = 0.0137  # inner pipe diameter, unit m
 k_p = 0.39  # heat conductivity of pipe, unit W/m/K
-
 # property of grout
 c_g = 2190*1735.160  # heat capacity of grout. unit J/K/m3
 k_g = 0.806  # heat conductivity of grout. unit W/m/K
+
+# set circulating water rate
+#parameter of the refrigerant
+rho_f = 1000 # kg/m3
+#w = 0.1 * 4.428 / 1052  # unit m3/sec rho
+w = 0.2 / rho_f  # unit m3/sec
+# heat capacity of circulating water
+c_f = 4204.436 * rho_f  # unit J/K/m3
+k_f = 0.62863  # unit W/m/K
 
 # calculate the convective film resistance inside pipe
 v_pi = w / (math.pi / 4 * d_pi * d_pi)
@@ -68,7 +69,6 @@ mu_f = 0.0067418  # unit kg/m/s
 Re = rho_f * v_pi * d_pi / mu_f
 
 # estimate film coefficients by the Gnielinski correlation
-k_f = 0.62863  # unit W/m/K
 Pr = mu_f / rho_f / alpha_s
 # Churchill correlation for friction factor Eq.(B.4)
 f = 1 / (1 / ((8 / Re) ** 10 + (Re / 36500) ** 20) ** 0.5 + (2.21 * math.log(Re / 7)) ** 10) ** 0.2
@@ -395,6 +395,24 @@ def zresult(nz, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDsta
         rt[i,3] = Stehfest_inv_Lap(F_2, tval, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, ns)  # outlet temperature at given time
     return rt
 
+# calculate fluid temperature distribution at the axial direction of borehole
+def Type_1U_BHE_tDist(Power, T_soil, nz, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDstart):
+    zRD = zresult(nz, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDstart)
+    # TD1 and TD2 are the dimensionless temperature
+    zD = zRD[:, 1]
+    zTD1 = zRD[:, 2]
+    zTD2 = zRD[:, 3]
+    H = np.zeros((nz))
+    T1z = np.zeros((nz))
+    T2z = np.zeros((nz))
+    # evaluate the fluid temperatures at the axial direction from correspnding dimensionless variables
+    for iz in range(nz):
+        H[iz] = Len * zD[iz]
+        T1z[iz] = Power * zTD1[iz] / (2 * math.pi * k_s * Len) + T_soil
+        T2z[iz] = Power * zTD2[iz] / (2 * math.pi * k_s * Len) + T_soil
+
+    return (H, T1z, T2z)
+
 # interface functions to main.py calculation procedure for the first timestep
 def Type_1U_BHE_cal_singel(Power, Tsoil, f_r):
     Tin = Power * global_coeff_Tin / (2 * math.pi * k_s * Len) + Tsoil
@@ -423,25 +441,7 @@ def Type_1U_BHE_cal(BHE_id, T_in, T_soil, f_r_cur, f_r_pre):
 
     return (Tout, Power)
 
-# calculate fluid temperature distribution at the axial direction of borehole
-def Type_1U_BHE_tDist(Power, T_soil, nz, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDstart):
-    zRD = zresult(nz, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDstart)
-    # TD1 and TD2 are the dimensionless temperature
-    zD = zRD[:, 1]
-    zTD1 = zRD[:, 2]
-    zTD2 = zRD[:, 3]
-    H = np.zeros((nz))
-    T1z = np.zeros((nz))
-    T2z = np.zeros((nz))
-    # evaluate the fluid temperatures at the axial direction from correspnding dimensionless variables
-    for iz in range(nz):
-        H[iz] = Len * zD[iz]
-        T1z[iz] = Power * zTD1[iz] / (2 * math.pi * k_s * Len) + T_soil
-        T2z[iz] = Power * zTD2[iz] / (2 * math.pi * k_s * Len) + T_soil
-
-    return (H, T1z, T2z)
-
-# main
+#%% main
 # calculate the dimensionless time tD1
 # ndiv = 10
 # ncycles = 5
@@ -484,7 +484,6 @@ tD1 = RD[0]
 #T_out = T_in - Q/(c_f*w)
 #print('For the given initial power', Q0, 'W, the inlet  temperature is', T1[0],'and outlet temperature is', T2[0])
 #print('For the given inlet temperature', T_in, ', the BHE power is', Q , 'W, the outlet temperature is ',T_out)
-# =============================================================================
-# initialise TD1 and TD2 coefficient for inflow and outflow termperature of each BHEs
+#%% initialise TD1 and TD2 coefficient for inflow and outflow termperature of each BHEs
 global_coeff_Tin = np.zeros(BHE_num) + TD1
 global_coeff_Tout= np.zeros(BHE_num) + TD2

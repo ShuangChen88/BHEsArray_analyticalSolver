@@ -152,7 +152,7 @@ for step in range(1, timestep_tot +1):
         print('Timestep %d took %.3f s' %(step, time.perf_counter() - time_step_start))
         
 #solver time counter end
-print('total solver execution took', (time.perf_counter() - time_solver_start), 's' )
+print('total solver execution took %d s' %(time.perf_counter() - time_solver_start))
 
 #import post procedure
 post.output_csv(BHE_num, timestep_tot,

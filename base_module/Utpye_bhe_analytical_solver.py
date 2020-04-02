@@ -422,6 +422,25 @@ def Type_1U_BHE_cal(BHE_id, T_in, T_soil, f_r_cur, f_r_pre):
         Tout = Power * global_coeff_Tout[BHE_id] / (2 * math.pi * k_s * Len) + T_soil
 
     return (Tout, Power)
+
+# calculate fluid temperature distribution at the axial direction of borehole
+def Type_1U_BHE_tDist(Power, T_soil, nz, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDstart):
+    zRD = zresult(nz, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDstart)
+    # TD1 and TD2 are the dimensionless temperature
+    zD = zRD[:, 1]
+    zTD1 = zRD[:, 2]
+    zTD2 = zRD[:, 3]
+    H = np.zeros((nz))
+    T1z = np.zeros((nz))
+    T2z = np.zeros((nz))
+    # evaluate the fluid temperatures at the axial direction from correspnding dimensionless variables
+    for iz in range(nz):
+        H[iz] = Len * zD[iz]
+        T1z[iz] = Power * zTD1[iz] / (2 * math.pi * k_s * Len) + T_soil
+        T2z[iz] = Power * zTD2[iz] / (2 * math.pi * k_s * Len) + T_soil
+
+    return (H, T1z, T2z)
+
 # main
 # calculate the dimensionless time tD1
 # ndiv = 10
@@ -454,21 +473,6 @@ tD1 = RD[0]
 # TDS2 = RD[:, 6]
 # TGS2 = RD[:, 7]
 # =============================================================================
-# calculate fluid temperature distribution at the axial direction of borehole
-nz = 20
-zRD = zresult(nz, N_s, N_w1, N_w2, N_12, H_g, H_f, kappa, A_D, r_Db, z_D, timeDstart)
-# TD1 and TD2 are the dimensionless temperature
-zD = zRD[:,1]
-zTD1 = zRD[:,2]
-zTD2 = zRD[:,3]
-H = np.zeros((nz))
-T1z = np.zeros((nz))
-T2z = np.zeros((nz))
-# evaluate the fluid temperatures at the axial direction from correspnding dimensionless variables
-for iz in range(nz):
-    H[iz] = Len * zD[iz]
-    T1z[iz]  = Q0 * zTD1[iz] / (2 * math.pi * k_s * Len) + T_s
-    T2z[iz]  = Q0 * zTD2[iz] / (2 * math.pi * k_s * Len) + T_s
 #t = (tD1 * c_s * (r_eq) ** 2 / k_s) * 3600  # this is in seconds
 #T1 = Q0 * TD1 / (2 * math.pi * k_s * Len) + T_s
 #T2 = Q0 * TD2 / (2 * math.pi * k_s * Len) + T_s

@@ -134,7 +134,7 @@ for step in range(1, timestep_tot +1):
             #sys time info output
             print('Convergence criterion: |dx|=%.3e, |x|=%.3e, |dx|/|x|=%.3e'
                   %(norm_delta_x, norm_x, norm_delta_x/norm_x))
-            if (norm_delta_x/norm_x) < 10e-6:
+            if (norm_delta_x/norm_x) < 1e-7:
                 if_converge = True
             if (if_converge):
                 #sys time info output

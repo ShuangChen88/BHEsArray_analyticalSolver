@@ -47,15 +47,14 @@ def network_status(t):
 # dynamic consumer thermal load
 def consumer_demand(t):  # dynamic thermal demand from consumer
     # time conversion
-    t_trans = int((t - 1) / 86400 / 30) + 1
+    t_trans = int((t - 1) / 86400 /30 ) + 1
     if t_trans > 12:
         t_trans = t_trans - 12 * (int(t_trans / 12))
     # thermal demand in each month (assumed specific heat extraction rate*
     # length of BHE* number of BHE)
     month_demand = [
+        -25 * 50 * 3, -0 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3,
         -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3,
-        -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3, -25 * 50 * 3,
-        -25 * 50 * 3, -25 * 50 * 3
     ]
     return month_demand[t_trans - 1]
 
@@ -120,17 +119,17 @@ def tespy_solver(t):
 #%% Tespy network model main solver function
 def nw_solver(t, Tout_val):
     #system operation status control
-    if_shutoff = False
+    if_sys_off = False
     # network status:
     nw_status = network_status(t)
     # if network closed:
     if nw_status == 'off':
-        if_shutoff = True
+        if_sys_off = True
         #flowrate
         for i in range(n_BHE):
             df_nw.loc[df_nw.index[i], 'flowrate'] = 0
         cur_cal_f_r_val = df_nw['flowrate'].tolist()
-        return (if_shutoff, cur_cal_f_r_val, Tout_val)
+        return (if_sys_off, cur_cal_f_r_val, Tout_val)
     else:
         # read Tout_val to dataframe
         for i in range(n_BHE):
@@ -138,7 +137,7 @@ def nw_solver(t, Tout_val):
         # TESPy solver
         cur_cal_f_r_val, cur_cal_Tin_val = tespy_solver(t)
         # return to main
-        return (if_success, cur_cal_f_r_val, cur_cal_Tin_val)
+        return (if_sys_off, cur_cal_f_r_val, cur_cal_Tin_val)
 
 
 #%%main

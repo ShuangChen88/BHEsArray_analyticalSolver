@@ -15,7 +15,7 @@ import post
 
 #%% User setting
 #main parameters
-time_tot = 10*24*60*60 #s
+time_tot = 90*24*60*60 #s
 delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
 
@@ -110,7 +110,7 @@ for step in range(1, timestep_tot +1):
                 # set BHEs power to 0
                 Result_df_BHE_power[:, step] = 0
                 # break the iteration
-                print('The system is shut off during the current timestep')
+                print('The system is shut off during the current time step')
                 break
             #sys time info output
             print('Solve tespy network took %.3f s' %(time.perf_counter() - time_mod_nw_start))
@@ -146,7 +146,7 @@ for step in range(1, timestep_tot +1):
             #sys time info output
             print('Convergence criterion: |dx|=%.3e, |x|=%.3e, |dx|/|x|=%.3e'
                   %(norm_delta_x, norm_x, norm_delta_x/norm_x))
-            if (norm_delta_x/norm_x) < 1e-7:
+            if (norm_delta_x/norm_x) < 1e-6:
                 if_converge = True
             if (if_converge):
                 #sys time info output

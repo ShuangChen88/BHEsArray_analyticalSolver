@@ -90,7 +90,8 @@ for step in range(1, timestep_tot +1):
         time_picard_iter_start = time.perf_counter()
         #uses BHE Tout array from last step as the initial Tout in the current network calculation
         Result_df_fluid_out[:,step] = Result_df_fluid_out[:,step - 1]
-        #picard iteration until Tout achieves converge  
+        #picard iteration until Tout achieves converge
+        if_converge = False
         for i in range(max_iter):
             print('Picard iteration %d start:' % i)
             if i == max_iter - 1:
@@ -98,8 +99,19 @@ for step in range(1, timestep_tot +1):
                                 
             #1st: TESPy solver
             time_mod_nw_start = time.perf_counter()
-            if_converge, f_r, T_in = mod_nw.nw_solver(t,
+            if_sys_off, f_r, T_in = mod_nw.nw_solver(t,
                                       Result_df_fluid_out[:,step])
+            # if system is shut off, no need to calculation for the current timestep
+            if (if_sys_off):
+                #set Tin same as it in the last timestep, Tout has been already set
+                Result_df_fluid_in[:, step] = Result_df_fluid_in[:, step - 1]
+                # set flow rate to 0
+                Result_df_BHE_f_r[:, step] = 0
+                # set BHEs power to 0
+                Result_df_BHE_power[:, step] = 0
+                # break the iteration
+                print('The system is shut off during the current timestep')
+                break
             #sys time info output
             print('Solve tespy network took %.3f s' %(time.perf_counter() - time_mod_nw_start))
             #update flowrate and Tin

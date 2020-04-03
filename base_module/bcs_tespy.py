@@ -126,8 +126,6 @@ def nw_solver(t, Tout_val):
     if nw_status == 'off':
         if_sys_off = True
         #flowrate
-        for i in range(n_BHE):
-            df_nw.loc[df_nw.index[i], 'flowrate'] = 0
         cur_cal_f_r_val = df_nw['flowrate'].tolist()
         return (if_sys_off, cur_cal_f_r_val, Tout_val)
     else:

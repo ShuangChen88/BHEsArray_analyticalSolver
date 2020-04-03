@@ -54,11 +54,11 @@ k_g = 0.806  # heat conductivity of grout. unit W/m/K
 
 # set circulating water rate
 #parameter of the refrigerant
-rho_f = 1000 # kg/m3
+rho_f = 996 # kg/m3
 #w = 0.1 * 4.428 / 1052  # unit m3/sec rho
 w = 0.2 / rho_f  # unit m3/sec
 # heat capacity of circulating water
-c_f = 4204.436 * rho_f  # unit J/K/m3
+c_f = 4179 * rho_f  # unit J/K/m3
 k_f = 0.62863  # unit W/m/K
 
 # calculate the convective film resistance inside pipe

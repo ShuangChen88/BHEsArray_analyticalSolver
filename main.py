@@ -15,7 +15,7 @@ import post
 
 #%% User setting
 #main parameters
-time_tot = 10*24*60*60 #s
+time_tot = 90*24*60*60 #s
 delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
 
@@ -90,29 +90,42 @@ for step in range(1, timestep_tot +1):
         time_picard_iter_start = time.perf_counter()
         #uses BHE Tout array from last step as the initial Tout in the current network calculation
         Result_df_fluid_out[:,step] = Result_df_fluid_out[:,step - 1]
-        #picard iteration until Tout achieves converge  
+        #picard iteration until Tout achieves converge
         for i in range(max_iter):
             print('Picard iteration %d start:' % i)
+            #convergence criterion initialise
+            if_converge = False
             if i == max_iter - 1:
                 raise Exception('The picard iteration could not achieve converge within %d steps' % max_iter)
                                 
             #1st: TESPy solver
             time_mod_nw_start = time.perf_counter()
-            if_converge, f_r, T_in = mod_nw.nw_solver(t,
+            if_sys_off, f_r, T_in = mod_nw.nw_solver(t,
                                       Result_df_fluid_out[:,step])
+            # if system is shut off, no need to calculation for the current timestep
+            if (if_sys_off):
+                #set Tin same as it in the last timestep, Tout has been already set
+                Result_df_fluid_in[:, step] = Result_df_fluid_in[:, step - 1]
+                # flow rate dataframe do not need to update for save the calculation cost
+                # set BHEs power to 0
+                Result_df_BHE_power[:, step] = 0
+                # break the iteration
+                print('The system is shut off during the current time step')
+                break
             #sys time info output
             print('Solve tespy network took %.3f s' %(time.perf_counter() - time_mod_nw_start))
-            #update flowrate and Tin
-            Result_df_BHE_f_r[:,step] = np.around(f_r, decimals=5)#flow rate in 5 significant digits
+            #update Tin and flowrate
             Result_df_fluid_in[:,step] = T_in
-            
+            Result_df_BHE_f_r[:,step] = np.around(f_r, decimals = 4) # flow rate in 4 significant digits
+                                                                   # to avoid deviation in tespy solver
+
             #2nd: BHE solver
             time_mod_bhe_start = time.perf_counter()
             #record the Tout array from last iteration for the next converge check
             pre_BHEs_Tout = Result_df_fluid_out[:,step].copy()
             for j in range(BHE_num):#loop all BHEs
-                #get the jth BHE's Tout and power from the current timestep 
-                #Tin, flowrate and Tsoil from last timestep.
+                #get the jth BHE's Tout and power from the current timestep
+                #Tin, flowrate and Tsoil from last timestep
                 #transfer the last step's flow rate of the BHE to determine if
                 #the hydraulic coefficients need to be updated in the selected BHE
                 cur_Tout_and_power = mod_bhe.Type_1U_BHE_cal(j,
@@ -134,7 +147,7 @@ for step in range(1, timestep_tot +1):
             #sys time info output
             print('Convergence criterion: |dx|=%.3e, |x|=%.3e, |dx|/|x|=%.3e'
                   %(norm_delta_x, norm_x, norm_delta_x/norm_x))
-            if (norm_delta_x/norm_x) < 1e-7:
+            if (norm_delta_x/norm_x) < 1e-6:
                 if_converge = True
             if (if_converge):
                 #sys time info output

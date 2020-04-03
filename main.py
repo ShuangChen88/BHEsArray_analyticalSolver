@@ -114,17 +114,18 @@ for step in range(1, timestep_tot +1):
                 break
             #sys time info output
             print('Solve tespy network took %.3f s' %(time.perf_counter() - time_mod_nw_start))
-            #update flowrate and Tin
-            Result_df_BHE_f_r[:,step] = np.around(f_r, decimals=5)#flow rate in 5 significant digits
+            #update Tin and flowrate
             Result_df_fluid_in[:,step] = T_in
-            
+            Result_df_BHE_f_r[:,step] = np.around(f_r, decimals = 4) # flow rate in 4 significant digits
+                                                                   # to avoid deviation in tespy solver
+
             #2nd: BHE solver
             time_mod_bhe_start = time.perf_counter()
             #record the Tout array from last iteration for the next converge check
             pre_BHEs_Tout = Result_df_fluid_out[:,step].copy()
             for j in range(BHE_num):#loop all BHEs
-                #get the jth BHE's Tout and power from the current timestep 
-                #Tin, flowrate and Tsoil from last timestep.
+                #get the jth BHE's Tout and power from the current timestep
+                #Tin, flowrate and Tsoil from last timestep
                 #transfer the last step's flow rate of the BHE to determine if
                 #the hydraulic coefficients need to be updated in the selected BHE
                 cur_Tout_and_power = mod_bhe.Type_1U_BHE_cal(j,

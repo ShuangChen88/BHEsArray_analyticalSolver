@@ -51,7 +51,8 @@ T0 = mod_ILS.T0
 Result_df_soil[:,0] = T0
 ##BHE
 #refrigerant flowrate
-Result_df_BHE_f_r += BHE_f_r_ini
+# flow rate in 4 significant digits to avoid deviation in tespy solver
+Result_df_BHE_f_r += np.around(BHE_f_r_ini, decimals = 4)
 #power
 Result_df_BHE_power[:,0] = np.nan
 ##fluid

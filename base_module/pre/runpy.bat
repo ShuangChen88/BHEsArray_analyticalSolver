@@ -1,1 +1,1 @@
-python 3bhes.py
+python 6bhes.py

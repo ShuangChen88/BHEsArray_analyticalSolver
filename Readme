@@ -1,1 +1,5 @@
-This analyical solver aims to enable the calculation of thermal shifting behaivor in an mutiple BHEs array.
+Master: this analyical solver aims to enable the calculation of thermal shifting behaivor in an mutiple BHEs array.
+
+
+Local branch: this branch gives a optimization procedure to solve multiple BHEs array with symmetry situation.
+Test case: 25 BHEs (5X5)

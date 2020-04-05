@@ -1,4 +1,7 @@
-data_index;BHE_id;Tin_val;Tout_val;Tout_node_id;flowrate;coord_x;coord_y
-BHE1;1;283.15;283.15;0;0;-6;100
-BHE2;2;283.15;283.15;0;0;0;100
-BHE3;3;283.15;283.15;0;0;6;100
+data_index;BHE_id;Tin_val;Tout_val;Tout_node_id;flowrate;coord_x;coord_y;weights
+BHE1;1;315.15;315.15;0;0;-12;112;4
+BHE2;2;315.15;315.15;0;0;-12;106;8
+BHE3;3;315.15;315.15;0;0;-12;100;4
+BHE7;4;315.15;315.15;0;0;-6;106;4
+BHE8;5;315.15;315.15;0;0;-6;100;4
+BHE13;6;315.15;315.15;0;0;0;100;1

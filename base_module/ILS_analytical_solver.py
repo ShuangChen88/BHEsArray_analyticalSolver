@@ -61,9 +61,10 @@ def st_dataframe(step,st):
     #first step no need
     if cur_step == 0:
         st_all_global[:,:,cur_step] = st[0]
-    for i in range(BHE_num):
-        for j in range(BHE_wall_points_num_all):
-            st_all_global[j,i,cur_step] = st[i]
+    else:
+        for i in range(BHE_num):
+            for j in range(BHE_wall_points_num_all):
+                st_all_global[j,i,cur_step] = st[i]
 
 #global coefficient data container(sourceterms to each reference point) of whole timesteps
 def ILS_solver_global_coeff():

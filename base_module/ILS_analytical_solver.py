@@ -34,15 +34,17 @@ timestep_tot = int(time_tot/delta_t)
 #%%basic input
 #BHE 
 BHE_num = geometry.bhe_num
+BHE_num_real = geometry.bhe_num_real
 BHE_wall_points_num = geometry.BHE_wall_points_num
 BHE_wall_points_num_all = np.size(geometry.bhe_wall_pos_x)
+BHE_weights = geometry.bhe_weights
 #power
 #create 3 dim dataframe to store the st_all for all BHE_wall_points
 #the data type in dataframe is:
 #axis 0: BHE_wall_points,
 #axis 1: BHE num, 
 #axis 2: timestep_tot  
-st_all_global = np.zeros((BHE_wall_points_num_all, BHE_num, timestep_tot))
+st_all_global = np.zeros((BHE_wall_points_num_all, BHE_num_real, timestep_tot))
 
 
 #bhe location

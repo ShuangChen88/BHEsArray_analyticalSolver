@@ -9,7 +9,8 @@ from pandas import read_csv
 #%% User setting
 #input geometry of the model
 
-bhe_num = 3 #BHE number
+bhe_num = 6 # virtual BHE number
+bhe_num_real = 25 # total BHE number in model
 BHE_wall_points_num = 4 #4 reference points on each BHE wall
 br = 0.063 # borehole raduis in m
 
@@ -54,3 +55,6 @@ bhe_wall_pos_y = np.array([])
 for i in range(bhe_num):
     bhe_wall_pos_x = np.concatenate((bhe_wall_pos_x, localVars['bhe_'+ str(i) + '_wall_pos_x' ]))
     bhe_wall_pos_y = np.concatenate((bhe_wall_pos_y, localVars['bhe_'+ str(i) + '_wall_pos_y' ]))
+
+#the BHEs weights array. (The weights means the related BHE represents how many symmetry BHEs in the entire BHEs array)
+bhe_weights = df_nw['weights'].values

@@ -23,7 +23,7 @@ time_tot = 90*24*60*60 #s
 delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
 
-BHE_num = 3 #BHEs number
+BHE_num = 6 #BHEs number
 # set length of the borehole
 Len = 50  # unit meter
 # set input heat rate
@@ -56,7 +56,7 @@ k_g = 0.806  # heat conductivity of grout. unit W/m/K
 #parameter of the refrigerant
 rho_f = 996 # kg/m3
 #w = 0.1 * 4.428 / 1052  # unit m3/sec rho
-w = 0.2 / rho_f  # unit m3/sec
+w = 0.024 / rho_f  # unit m3/sec
 # heat capacity of circulating water
 c_f = 4179 * rho_f  # unit J/K/m3
 k_f = 0.62863  # unit W/m/K

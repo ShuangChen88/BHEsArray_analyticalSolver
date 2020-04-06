@@ -19,7 +19,7 @@ import math
 # Email:  haibing(dot)shao(at)gmail(dot)com
 
 #main parameters
-time_tot = 30*24*60*60 #s
+time_tot = 60*24*60*60 #s
 delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
 

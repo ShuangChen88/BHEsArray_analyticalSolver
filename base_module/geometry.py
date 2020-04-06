@@ -15,20 +15,24 @@ BHE_wall_points_num = 4 #4 reference points on each BHE wall
 br = 0.063 # borehole raduis in m
 
 #End User setting
-#%% BHEs coordinates
+#%% real BHEs coordinates
+#note: the sequence of the BHEs should be same as the BHEs sequence defined in the global_bhes_sequence_table.csv
+real_df_nw = read_csv('./base_module/pre/global_bhes_sequence_table.csv',
+                    delimiter=';')
+
+real_bhe_pos_x = real_df_nw['coord_x'].values
+real_bhe_pos_y = real_df_nw['coord_y'].values
+
+#%% virtual BHEs coordinates
 #note: the sequence of the BHEs should be same as the BHEs sequence defined in the tespy model
 #Read the coordinates from the BHE network csv
-df_nw = read_csv('./base_module/pre/bhe_network.csv',
+v_df_nw = read_csv('./base_module/pre/bhe_network.csv',
                     delimiter=';',
                     index_col=[0],
                     dtype={'data_index': str})
 
-bhe_pos_x = np.zeros(bhe_num)
-bhe_pos_y = np.zeros(bhe_num)
-
-for i in range(bhe_num):
-    bhe_pos_x[i] = df_nw.loc[df_nw.index[i],'coord_x']
-    bhe_pos_y[i] = df_nw.loc[df_nw.index[i],'coord_y']
+v_bhe_pos_x = v_df_nw['coord_x'].values
+v_bhe_pos_y = v_df_nw['coord_y'].values
 
 #%% selected bohrehole wall location point 
 # each selected bhe has 4 around points, the calculated soil tempererature on the borhehole
@@ -39,14 +43,14 @@ localVars = locals()
 
 #create the 4 reference points on each BHE's wall 
 for i in range(bhe_num):
-    localVars['bhe_'+ str(i) + '_wall_pos_x' ]  =  np.array([-br + bhe_pos_x[i],
-                                                         0 + bhe_pos_x[i],
-                                                         br + bhe_pos_x[i],
-                                                         0 + bhe_pos_x[i]],dtype=float)
-    localVars['bhe_'+ str(i) + '_wall_pos_y' ]   = np.array([0 + bhe_pos_y[i],
-                                                             br + bhe_pos_y[i],
-                                                             0 + bhe_pos_y[i],
-                                                            -br + bhe_pos_y[i]],dtype=float)
+    localVars['bhe_'+ str(i) + '_wall_pos_x' ]  =  np.array([-br + v_bhe_pos_x[i],
+                                                         0 + v_bhe_pos_x[i],
+                                                         br + v_bhe_pos_x[i],
+                                                         0 + v_bhe_pos_x[i]],dtype=float)
+    localVars['bhe_'+ str(i) + '_wall_pos_y' ]   = np.array([0 + v_bhe_pos_y[i],
+                                                             br + v_bhe_pos_y[i],
+                                                             0 + v_bhe_pos_y[i],
+                                                            -br + v_bhe_pos_y[i]],dtype=float)
 
 #combine all reference points into one reference array, same with BHE coordinates 
 #array sequence, every 4 points refer to one BHE

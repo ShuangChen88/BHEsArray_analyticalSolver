@@ -47,9 +47,9 @@ BHE_weights = geometry.bhe_weights
 st_all_global = np.zeros((BHE_wall_points_num_all, BHE_num_real, timestep_tot))
 
 
-#bhe location
-bhe_pos_x = geometry.bhe_pos_x
-bhe_pos_y = geometry.bhe_pos_y
+#real bhe location
+bhe_pos_x = geometry.real_bhe_pos_x
+bhe_pos_y = geometry.real_bhe_pos_y
 
 #import reference points (borehole wall points)
 bhe_wall_pos_x = geometry.bhe_wall_pos_x
@@ -57,6 +57,8 @@ bhe_wall_pos_y = geometry.bhe_wall_pos_y
 
 #%% functions
 #global sourceterm array data container
+#local count
+m = 0
 def st_dataframe(step,st):
     #sourceterm dataframe starts from step = 1.
     cur_step = step - 1
@@ -64,20 +66,24 @@ def st_dataframe(step,st):
     if cur_step == 0:
         st_all_global[:,:,cur_step] = st[0]
     else:
+        # m represents the real BHE' sequence
+        global m
         for i in range(BHE_num):
-            for j in range(BHE_wall_points_num_all):
-                st_all_global[j,i,cur_step] = st[i]
+            for i1 in range(BHE_weights[i]):
+                for j in range(BHE_wall_points_num_all):
+                    st_all_global[j,m,cur_step] = st[i]
+            m += 1
 
-#global coefficient data container(sourceterms to each reference point) of whole timesteps
+#global coefficient data container(global sourceterms to each reference point) of whole timesteps
 def ILS_solver_global_coeff():
-    coeff_all = np.zeros([BHE_wall_points_num_all,BHE_num,timestep_tot])
+    coeff_all = np.zeros([BHE_wall_points_num_all,BHE_num_real,timestep_tot])
     
     for currstep in range(0,timestep_tot):
         #data container
-        dist_bhe_to_ref_po= np.zeros([BHE_wall_points_num_all,BHE_num])
-        localcoeff= np.zeros([BHE_wall_points_num_all,BHE_num])
+        dist_bhe_to_ref_po= np.zeros([BHE_wall_points_num_all,BHE_num_real])
+        localcoeff= np.zeros([BHE_wall_points_num_all,BHE_num_real])
         
-        for i in range(0,BHE_num):
+        for i in range(0,BHE_num_real):
             #coefficient of current timestep
             for j in range(0,BHE_wall_points_num_all):
                 dist_bhe_to_ref_po[j,i] = (bhe_pos_x[i] - bhe_wall_pos_x[j] )**2     \

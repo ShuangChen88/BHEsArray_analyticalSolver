@@ -12,6 +12,7 @@ from pandas import read_csv
 from tespy.networks import load_network
 
 #%% User setting
+tot_flowrate = 0.6 #kg/s
 bhe_num_real = 25 # total BHE number in model
 # switch for special boundary conditions
 # 'on','off', switch of the function for dynamic thermal demand from consumer
@@ -105,7 +106,7 @@ def tespy_solver(t):
     for i in range(n_BHE):
         # get flowrate in kg ^ 3 / s directly by averaging the total flowrate with total real BHEs number
         df_nw.loc[df_nw.index[i],
-               'flowrate'] = cur_frate / bhe_num_real
+               'flowrate'] = tot_flowrate / bhe_num_real
         # get Tin_val
         df_nw.loc[df_nw.index[i],
                'Tin_val'] = localVars['inlet_BHE' +

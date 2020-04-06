@@ -61,4 +61,4 @@ for i in range(bhe_num):
     bhe_wall_pos_y = np.concatenate((bhe_wall_pos_y, localVars['bhe_'+ str(i) + '_wall_pos_y' ]))
 
 #the BHEs weights array. (The weights means the related BHE represents how many symmetry BHEs in the entire BHEs array)
-bhe_weights = df_nw['weights'].values
+bhe_weights = v_df_nw['weights'].values

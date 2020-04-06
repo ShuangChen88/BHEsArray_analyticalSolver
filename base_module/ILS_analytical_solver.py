@@ -26,7 +26,7 @@ k_s = 2.4 #W/m*K
 alpha = k_s/(rho_s*c_s) #m^2/s
 
 #time
-time_tot = 90*24*60*60 #s
+time_tot = 10*24*60*60 #s
 delta_t = 86400 #s
 timestep_tot = int(time_tot/delta_t)
 
@@ -73,6 +73,8 @@ def st_dataframe(step,st):
                 for j in range(BHE_wall_points_num_all):
                     st_all_global[j,m,cur_step] = st[i]
             m += 1
+        #reset m
+        m = 0
 
 #global coefficient data container(global sourceterms to each reference point) of whole timesteps
 def ILS_solver_global_coeff():

@@ -8,7 +8,7 @@ import pandas as pd
 def output_csv(BHE_num, timestep_tot,
                df_Tsoil, df_power, df_flowrate, df_Tin, df_Tout):
     # get the feature BHE names from the BHE_network.csv
-    df_nw = read_csv('./base_module/pre/bhe_network.csv',
+    df_nw = pd.read_csv('./base_module/pre/bhe_network.csv',
                      delimiter=';',
                      index_col=[0],
                      dtype={'data_index': str})

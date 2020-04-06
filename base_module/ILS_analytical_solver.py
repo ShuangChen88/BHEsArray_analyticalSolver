@@ -72,7 +72,7 @@ def st_dataframe(step,st):
             for i1 in range(BHE_weights[i]):
                 for j in range(BHE_wall_points_num_all):
                     st_all_global[j,m,cur_step] = st[i]
-            m += 1
+                m += 1
         #reset m
         m = 0
 

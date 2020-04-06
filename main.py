@@ -21,6 +21,7 @@ timestep_tot = int(time_tot/delta_t)
 
 #BHE
 BHE_num = 6
+BHE_num_real = 25
 BHE_length = 50 #m
 #initial flowrate in each BHE, the global BHE flowrate curve is defined 
 #in bcs_tespy.py or tespy model
@@ -73,7 +74,7 @@ for step in range(1, timestep_tot +1):
     # equal power for all BHEs on the first thermal loading
     if step == 1:
         #update global dataframe BHE power
-        Result_df_BHE_power[:,step] = mod_nw.consumer_demand(0)/BHE_num
+        Result_df_BHE_power[:,step] = mod_nw.consumer_demand(0)/BHE_num_real
         #update global dataframe BHE inflow and out flow
         first_step_Tin_and_Tout = mod_bhe.Type_1U_BHE_cal_singel(
                 Result_df_BHE_power[0,step], T0, Result_df_BHE_f_r[0,step])
